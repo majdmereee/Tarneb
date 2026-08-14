@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tarneeb Pro Ultimate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a; --surface: #1e293b; --surface-light: #334155;
+            --accent: #38bdf8; --accent-hover: #0ea5e9;
+            --danger: #ef4444; --success: #22c55e;
+            --red-suit: #ef4444; --black-suit: #111;
+            --font: 'Tajawal', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+        /* الأزرار الاحترافية */
+        .btn-pro {
+            background: var(--surface-light); color: white; font-size: 1.1rem; font-weight: 900;
+            padding: 12px 24px; border-radius: 8px; border: 1px solid var(--accent); cursor: pointer;
+            transition: all 0.2s; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn-pro:active { transform: scale(0.95); }
+        .btn-pro.highlight { background: var(--accent); color: var(--bg); border-color: var(--accent-hover); }
+        .btn-pro.disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; color: #888; background: #222; }
+
+        input { width: 100%; padding: 15px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; border: 1px solid #444; background: var(--bg); color: var(--accent); margin-bottom: 20px; text-align: center; }
+
+        .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
+        .screen.active { display: flex; }
+        .center-box { margin: auto; background: var(--surface); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+
+        /* البطاقات (تصغير الحجم) */
+        .playing-card {
+            width: 55px; height: 85px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px;
+            font-size: 1.1rem; font-weight: 900; cursor: pointer; background: #fff;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border 0.1s; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.5); border: 1px solid #ddd;
+        }
+        .playing-card.red { color: var(--red-suit); }
+        .playing-card.black { color: var(--black-suit); }
+        
+        /* التحديد */
+        .playing-card.selected { transform: translateY(-20px) scale(1.1); border: 3px solid var(--accent); z-index: 50 !important; box-shadow: 0 10px 20px rgba(56, 189, 248, 0.6); }
+        .playing-card.disabled { filter: brightness(0.6); cursor: not-allowed; }
+
+        .card-top { align-self: flex-start; line-height: 1; }
+        .card-center { align-self: center; font-size: 1.8rem; }
+        .card-bottom { align-self: flex-end; transform: rotate(180deg); line-height: 1; }
+
+        /* طاولة اللعب (Tarneeb specific Layout) */
+        .hud { display: flex; justify-content: space-between; padding: 10px 20px; background: var(--surface); border-bottom: 1px solid #333; font-weight: bold; font-size: 1rem; align-items: center; }
+        .scoreboard { display: flex; gap: 20px; color: var(--accent); }
+        
+        .table-area { flex: 1; display: grid; grid-template-columns: 1fr 2fr 1fr; grid-template-rows: 1fr 2fr 1fr; position: relative; padding: 10px; }
+        
+        .player-pos { display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; color: #aaa; text-align: center; }
+        .player-pos.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .pos-top { grid-column: 2; grid-row: 1; }
+        .pos-left { grid-column: 1; grid-row: 2; }
+        .pos-right { grid-column: 3; grid-row: 2; }
+        .pos-bottom { grid-column: 2; grid-row: 3; }
+
+        /* الأوراق الملعوبة على الطاولة */
+        .center-trick { grid-column: 2; grid-row: 2; display: flex; justify-content: center; align-items: center; position: relative; }
+        .trick-card { position: absolute; transform: scale(1.2); }
+        .tc-top { transform: translateY(-40px) scale(1.1); z-index: 1; }
+        .tc-bottom { transform: translateY(40px) scale(1.1); z-index: 4; }
+        .tc-left { transform: translateX(-40px) scale(1.1); z-index: 2; }
+        .tc-right { transform: translateX(40px) scale(1.1); z-index: 3; }
+
+        /* أشرطة التحكم السفلية */
+        .controls-bar { display: flex; justify-content: center; gap: 15px; padding: 10px; background: rgba(0,0,0,0.5); z-index: 100; position: absolute; bottom: 130px; width: 100%; }
+        .hand-container { height: 120px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px; overflow-x: auto; background: var(--surface); border-top: 1px solid #444; }
+        .hand-container .playing-card { margin: 0 -15px; }
+
+        /* الموديلات (النوافذ) */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 900; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        
+        .grid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .bid-btn { padding: 15px; font-size: 1.5rem; font-weight: bold; background: var(--surface-light); border: 1px solid #555; color: white; border-radius: 8px; cursor: pointer; }
+        .bid-btn:active { background: var(--accent); }
+        .bid-btn.pass { background: var(--danger); grid-column: span 4; }
+
+        /* عرض كامل الورق */
+        .full-hand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .full-hand-grid .playing-card { margin: 0; width: 60px; height: 90px; }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--bg); padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; z-index: 1000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+
+    <div id="toast">نظام الطرنيب</div>
+
+    <!-- شاشة الدخول -->
+    <div id="screen-login" class="screen active">
+        <div class="center-box">
+            <h1 style="font-size: 3rem; color: var(--accent); margin-bottom: 5px;">الطرنيب</h1>
+            <h3 style="color: #888; margin-bottom: 20px;">النسخة الاحترافية</h3>
+            <input type="text" id="playerName" placeholder="اسمك..." maxlength="10">
+            <button class="btn-pro highlight" onclick="initNetwork(true)" style="margin-bottom: 10px;">إنشاء طاولة (مضيف)</button>
+            <button class="btn-pro" onclick="initNetwork(false)">انضمام للطاولة</button>
+        </div>
+    </div>
+
+    <!-- شاشة الانتظار -->
+    <div id="screen-lobby" class="screen">
+        <div class="center-box">
+            <h2 style="margin-bottom: 20px; color: var(--accent);">غرفة الانتظار (الطرنيب)</h2>
+            <div id="lobby-players" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
+            <p id="wait-msg" style="color: var(--danger); font-weight: bold;">بانتظار اكتمال العدد (4 لاعبين حصراً)...</p>
+            <button id="btn-start-game" class="btn-pro highlight" style="display: none;" onclick="startGame()">توزيع الورق وبدء اللعب</button>
+        </div>
+    </div>
+
+    <!-- شاشة اللعب -->
+    <div id="screen-game" class="screen">
+        <div class="hud">
+            <div class="scoreboard">
+                <div>لنا (فريق 1): <span id="score-team1" style="color:white; font-size:1.2rem;">0</span></div>
+                <div>لهم (فريق 2): <span id="score-team2" style="color:white; font-size:1.2rem;">0</span></div>
+            </div>
+            <div style="text-align: left;">
+                <div style="color:#aaa; font-size:0.8rem;">الطرنيب: <span id="hud-tarneeb" style="color:white; font-size:1.2rem;">-</span></div>
+                <div style="color:#aaa; font-size:0.8rem;">الطلبة: <span id="hud-bid" style="color:white; font-size:1.2rem;">-</span></div>
+            </div>
+        </div>
+        
+        <div class="table-area">
+            <div class="player-pos pos-top" id="pos-top">الزميل</div>
+            <div class="player-pos pos-left" id="pos-left">خصم يسار</div>
+            <div class="player-pos pos-right" id="pos-right">خصم يمين</div>
+            
+            <div class="center-trick" id="table-trick">
+                <!-- الأوراق الأربعة الملعوبة -->
+            </div>
+            
+            <div class="player-pos pos-bottom" id="pos-bottom" style="color: var(--accent);">أنت</div>
+        </div>
+
+        <!-- أزرار التحكم بالتحديد -->
+        <div class="controls-bar" id="controls-bar">
+            <button class="btn-pro" onclick="showFullHandModal()">👀 عرض كامل الورق</button>
+            <button class="btn-pro highlight disabled" id="btn-play-selected" onclick="confirmPlayCard()">لعب الورقة المختارة 👆</button>
+        </div>
+
+        <div class="hand-container" id="my-hand"></div>
+    </div>
+
+    <!-- نافذة الطلبة (Bidding) -->
+    <div class="modal" id="modal-bid">
+        <div class="center-box">
+            <h2 style="color: var(--accent); margin-bottom: 10px;">دورك في الطلبة</h2>
+            <p style="color: #aaa; margin-bottom: 20px;">أعلى طلبة حالياً: <span id="current-highest-bid" style="color:white; font-weight:bold;">لا يوجد</span></p>
+            <div class="grid-options" id="bid-options">
+                <!-- أزرار 7 إلى 13 تولد عبر JS -->
+            </div>
+            <button class="bid-btn pass" onclick="submitBid(0)">باس (Pass)</button>
+        </div>
+    </div>
+
+    <!-- نافذة اختيار الطرنيب -->
+    <div class="modal" id="modal-suit">
+        <div class="center-box">
+            <h2 style="color: var(--success); margin-bottom: 20px;">لقد فزت بالطلبة! اختر الطرنيب</h2>
+            <div class="grid-options" style="grid-template-columns: repeat(2, 1fr);">
+                <button class="bid-btn" style="color:var(--red-suit);" onclick="submitSuit('♥')">♥ كبة</button>
+                <button class="bid-btn" style="color:var(--red-suit);" onclick="submitSuit('♦')">♦ ديناري</button>
+                <button class="bid-btn" style="color:var(--black-suit);" onclick="submitSuit('♣')">♣ سباتي</button>
+                <button class="bid-btn" style="color:var(--black-suit);" onclick="submitSuit('♠')">♠ بستوني</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- عرض كامل الورق -->
+    <div class="modal" id="modal-full-hand">
+        <div class="center-box" style="max-width: 600px; background: rgba(30,41,59,0.95);">
+            <h2 style="color: var(--accent); margin-bottom: 20px;">أوراقي بالكامل</h2>
+            <div class="full-hand-grid" id="full-hand-grid-content"></div>
+            <button class="btn-pro" style="margin-top: 20px; width: 100%;" onclick="closeModal('modal-full-hand')">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ثوابت ومحرك ورق الطرنيب
+        // ==========================================
+        const SUITS = [{s:'♥', c:'red'}, {s:'♦', c:'red'}, {s:'♣', c:'black'}, {s:'♠', c:'black'}];
+        const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']; // من الأضعف للأقوى
+        
+        let ws;
+        let myId = Math.random().toString(36).substr(2, 9);
+        let myName = "";
+        let isHost = false;
+        
+        let selectedCardId = null;
+
+        // حالة اللعبة المركزية (State Machine)
+        let gameState = {
+            status: 'waiting', // waiting, bidding, suit_selection, playing, scoring
+            players: [], // 0 & 2 (Team 1), 1 & 3 (Team 2)
+            turnIdx: 0, 
+            dealerIdx: 0,
+            
+            // متغيرات الطلبة
+            bids: [], // من طلب ماذا
+            highestBid: 0,
+            highestBidderIdx: -1,
+            passCount: 0,
+            
+            tarneebSuit: '',
+            
+            // متغيرات اللعب
+            currentTrick: [], // الأوراق الملعوبة في هذه الدورة {playerId, card}
+            trickScores: { team1: 0, team2: 0 }, // الأكلات المجمعة في هذه الجولة
+            gameScores: { team1: 0, team2: 0 }, // النقاط الكلية (حتى 31)
+            leadingSuit: '' // نوع الورقة التي لُعبت أولاً في الدورة
+        };
+
+        // ==========================================
+        // وظائف الواجهة المساعدة
+        // ==========================================
+        function showToast(msg) {
+            let t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+        function switchScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ==========================================
+        // 1. إدارة الشبكة
+        // ==========================================
+        function initNetwork(asHost) {
+            let nameInput = document.getElementById('playerName').value.trim();
+            if(!nameInput) return showToast("الاسم مطلوب للعب!");
+            myName = nameInput; isHost = asHost;
+            
+            if(isHost) {
+                gameState.players.push({ id: myId, name: myName, hand: [] });
+            }
+
+            ws = new WebSocket(`ws://${location.host}/ws`);
+            ws.onopen = () => {
+                switchScreen('screen-lobby');
+                ws.send(JSON.stringify({ type: 'join', id: myId, name: myName }));
+                if(isHost) renderLobby();
+            };
+
+            ws.onmessage = (e) => {
+                let data = JSON.parse(e.data);
+                
+                if (isHost && data.type === 'join' && data.id !== myId) {
+                    if(gameState.players.length < 4) {
+                        gameState.players.push({ id: data.id, name: data.name, hand: [] });
+                        broadcastState();
+                    }
+                } else if (isHost && data.type === 'action') {
+                    processAction(data.actionData);
+                } else if (data.type === 'state_update') {
+                    gameState = data.state;
+                    handleStateChange();
+                }
+            };
+        }
+
+        function broadcastState() {
+            if(!isHost) return;
+            ws.send(JSON.stringify({ type: 'state_update', state: gameState }));
+            handleStateChange(); // تحديث المضيف
+        }
+
+        function handleStateChange() {
+            if(gameState.status === 'waiting') {
+                renderLobby();
+            } else {
+                renderGame();
+                handleModals();
+            }
+        }
+
+        function renderLobby() {
+            let html = '';
+            gameState.players.forEach((p, idx) => { 
+                let team = (idx % 2 === 0) ? '(فريق 1)' : '(فريق 2)';
+                html += `<div style="background: var(--surface-light); padding: 15px; border-radius: 8px; border: 1px solid #444;">👤 ${p.name} <span style="color:#aaa; font-size:0.9rem;">${team}</span></div>`; 
+            });
+            document.getElementById('lobby-players').innerHTML = html;
+            
+            if(isHost) {
+                let btn = document.getElementById('btn-start-game');
+                let msg = document.getElementById('wait-msg');
+                if(gameState.players.length === 4) {
+                    btn.style.display = 'block'; msg.style.display = 'none';
+                } else {
+                    btn.style.display = 'none'; msg.style.display = 'block';
+                    msg.innerText = `العدد الحالي: ${gameState.players.length}/4 ...`;
+                }
+            }
+        }
+
+        // ==========================================
+        // 2. محرك الطرنيب (Host Logic)
+        // ==========================================
+        function startGame() {
+            if(gameState.players.length !== 4) return;
+            gameState.gameScores = { team1: 0, team2: 0 };
+            gameState.dealerIdx = Math.floor(Math.random() * 4);
+            startRound();
+        }
+
+        function startRound() {
+            // توليد وخلط الـ 52 ورقة
+            let deck = [];
+            SUITS.forEach(suit => { RANKS.forEach(rank => { deck.push({ id: rank+suit.s, rank: rank, suit: suit.s, color: suit.c }); }); });
+            deck = deck.sort(() => Math.random() - 0.5);
+
+            gameState.players.forEach(p => p.hand = []);
+            let pIdx = 0;
+            while(deck.length > 0) {
+                gameState.players[pIdx].hand.push(deck.pop());
+                pIdx = (pIdx + 1) % 4;
+            }
+
+            // ترتيب الأوراق في اليد بقوة
+            gameState.players.forEach(p => {
+                p.hand.sort((a, b) => {
+                    if(a.suit === b.suit) return RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank);
+                    return SUITS.findIndex(s=>s.s===a.suit) - SUITS.findIndex(s=>s.s===b.suit);
+                });
+            });
+
+            // إعادة ضبط متغيرات الجولة
+            gameState.status = 'bidding';
+            gameState.bids = [0,0,0,0];
+            gameState.highestBid = 6; // الحد الأدنى للطلبة 7
+            gameState.highestBidderIdx = -1;
+            gameState.passCount = 0;
+            gameState.tarneebSuit = '';
+            gameState.trickScores = { team1: 0, team2: 0 };
+            gameState.currentTrick = [];
+            
+            // يبدأ الطلبة اللاعب الذي يمين الموزع (أو بعده)
+            gameState.turnIdx = (gameState.dealerIdx + 1) % 4;
+            
+            broadcastState();
+        }
+
+        function processAction(act) {
+            let activeP = gameState.players[gameState.turnIdx];
+            if(act.playerId !== activeP.id) return; // حماية الأدوار الصارمة
+
+            if(gameState.status === 'bidding' && act.type === 'make_bid') {
+                if(act.bid === 0) { // Pass
+                    gameState.passCount++;
+                } else if (act.bid > gameState.highestBid) {
+                    gameState.highestBid = act.bid;
+                    gameState.highestBidderIdx = gameState.turnIdx;
+                    gameState.passCount = 0; // تصفير الباس عند طلبة جديدة
+                }
+
+                if(gameState.passCount === 3 && gameState.highestBidderIdx !== -1) {
+                    // فاز أحدهم
+                    gameState.status = 'suit_selection';
+                    gameState.turnIdx = gameState.highestBidderIdx;
+                } else if (gameState.passCount === 4) {
+                    // الكل باس -> إعادة توزيع
+                    gameState.dealerIdx = (gameState.dealerIdx + 1) % 4;
+                    startRound();
+                    return;
+                } else {
+                    // انتقال الدور للطلبة التالية
+                    gameState.turnIdx = (gameState.turnIdx + 1) % 4;
+                }
+                broadcastState();
+            }
+            else if (gameState.status === 'suit_selection' && act.type === 'select_suit') {
+                gameState.tarneebSuit = act.suit;
+                gameState.status = 'playing';
+                // يبدأ اللعب من فاز بالطلبة
+                gameState.turnIdx = gameState.highestBidderIdx;
+                broadcastState();
+            }
+            else if (gameState.status === 'playing' && act.type === 'play_card') {
+                let p = gameState.players.find(pl => pl.id === act.playerId);
+                let cIdx = p.hand.findIndex(c => c.id === act.cardId);
+                let card = p.hand[cIdx];
+
+                // حماية الخداع: يجب اللعب من نفس النوع إذا توفر
+                if(gameState.currentTrick.length > 0) {
+                    let leadSuit = gameState.currentTrick[0].card.suit;
+                    let hasLeadSuit = p.hand.some(c => c.suit === leadSuit);
+                    if(hasLeadSuit && card.suit !== leadSuit) return; // لعب غير شرعي!
+                } else {
+                    gameState.leadingSuit = card.suit; // تحديد نوع الأكلة
+                }
+
+                p.hand.splice(cIdx, 1);
+                gameState.currentTrick.push({ playerId: p.id, card: card });
+                
+                if(gameState.currentTrick.length === 4) {
+                    // تقييم الأكلة
+                    gameState.turnIdx = -1; // إيقاف اللعب مؤقتاً
+                    broadcastState();
+                    setTimeout(() => evaluateTrick(), 2000); // عرض الأوراق ثانيتين ثم جمعها
+                } else {
+                    gameState.turnIdx = (gameState.turnIdx + 1) % 4;
+                    broadcastState();
+                }
+            }
+        }
+
+        function evaluateTrick() {
+            let leadSuit = gameState.currentTrick[0].card.suit;
+            let tarneeb = gameState.tarneebSuit;
+            let winningCard = gameState.currentTrick[0];
+
+            for(let i=1; i<4; i++) {
+                let c = gameState.currentTrick[i];
+                let isCurrentTarneeb = (c.card.suit === tarneeb);
+                let isWinningTarneeb = (winningCard.card.suit === tarneeb);
+
+                if(isCurrentTarneeb && !isWinningTarneeb) {
+                    winningCard = c; // طرنيب يقطع أي شيء
+                } else if (isCurrentTarneeb && isWinningTarneeb) {
+                    if(RANKS.indexOf(c.card.rank) > RANKS.indexOf(winningCard.card.rank)) winningCard = c;
+                } else if (c.card.suit === leadSuit && !isWinningTarneeb) {
+                    if(RANKS.indexOf(c.card.rank) > RANKS.indexOf(winningCard.card.rank)) winningCard = c;
+                }
+            }
+
+            // إعطاء النقطة للفريق الفائز
+            let winnerIdx = gameState.players.findIndex(p => p.id === winningCard.playerId);
+            if(winnerIdx === 0 || winnerIdx === 2) gameState.trickScores.team1++;
+            else gameState.trickScores.team2++;
+
+            gameState.currentTrick = [];
+            
+            // التحقق من انتهاء الجولة
+            if(gameState.players[0].hand.length === 0) {
+                evaluateRound();
+            } else {
+                gameState.turnIdx = winnerIdx; // الفائز يبدأ
+                broadcastState();
+            }
+        }
+
+        function evaluateRound() {
+            let reqBid = gameState.highestBid;
+            let bidTeam = (gameState.highestBidderIdx === 0 || gameState.highestBidderIdx === 2) ? 1 : 2;
+            
+            if(bidTeam === 1) {
+                if(gameState.trickScores.team1 >= reqBid) gameState.gameScores.team1 += gameState.trickScores.team1;
+                else gameState.gameScores.team1 -= reqBid;
+                gameState.gameScores.team2 += gameState.trickScores.team2;
+            } else {
+                if(gameState.trickScores.team2 >= reqBid) gameState.gameScores.team2 += gameState.trickScores.team2;
+                else gameState.gameScores.team2 -= reqBid;
+                gameState.gameScores.team1 += gameState.trickScores.team1;
+            }
+
+            // فحص الفوز باللعبة الكلية (31 نقطة)
+            if(gameState.gameScores.team1 >= 31 || gameState.gameScores.team2 >= 31) {
+                gameState.status = 'finished';
+            } else {
+                gameState.dealerIdx = (gameState.dealerIdx + 1) % 4;
+                startRound();
+            }
+            broadcastState();
+        }
+
+        // ==========================================
+        // 3. التقديم والواجهة (Client Rendering)
+        // ==========================================
+        function sendAction(data) {
+            if(isHost) processAction(data);
+            else ws.send(JSON.stringify({ type: 'action', actionData: data }));
+        }
+
+        function renderGame() {
+            switchScreen('screen-game');
+            let meIdx = gameState.players.findIndex(p => p.id === myId);
+            let me = gameState.players[meIdx];
+            let activePlayer = gameState.players[gameState.turnIdx];
+
+            // HUD
+            document.getElementById('score-team1').innerText = gameState.gameScores.team1;
+            document.getElementById('score-team2').innerText = gameState.gameScores.team2;
+            document.getElementById('hud-tarneeb').innerText = gameState.tarneebSuit || '-';
+            document.getElementById('hud-bid').innerText = gameState.highestBid > 6 ? gameState.highestBid : '-';
+
+            // توزيع اللاعبين على الطاولة (أنت دائماً بالأسفل)
+            let partnerIdx = (meIdx + 2) % 4;
+            let rightIdx = (meIdx + 3) % 4; // يمينك
+            let leftIdx = (meIdx + 1) % 4; // يسارك
+
+            _updatePos('pos-top', partnerIdx, activePlayer?.id);
+            _updatePos('pos-left', leftIdx, activePlayer?.id);
+            _updatePos('pos-right', rightIdx, activePlayer?.id);
+            document.getElementById('pos-bottom').className = `player-pos pos-bottom ${(activePlayer?.id === myId) ? 'active' : ''}`;
+            document.getElementById('pos-bottom').innerText = `أنت (${gameState.trickScores[meIdx%2===0?'team1':'team2']} أكلات)`;
+
+            // رسم الأوراق في اليد
+            let isMyTurnToPlay = (gameState.status === 'playing' && activePlayer?.id === myId);
+            let handHtml = '';
+            let leadSuit = gameState.currentTrick.length > 0 ? gameState.currentTrick[0].card.suit : null;
+            let hasLeadSuit = me.hand.some(c => c.suit === leadSuit);
+
+            me.hand.forEach((c, idx) => {
+                let valid = true;
+                if(isMyTurnToPlay && leadSuit && hasLeadSuit && c.suit !== leadSuit) valid = false; // إجبار
+
+                let isSel = (selectedCardId === c.id) ? 'selected' : '';
+                let dis = (!isMyTurnToPlay || !valid) ? 'disabled' : '';
+                
+                handHtml += `
+                    <div class="playing-card ${c.color} ${isSel} ${dis}" style="z-index:${idx}" onclick="selectCard('${c.id}', ${isMyTurnToPlay}, ${valid})">
+                        <div class="card-top">${c.rank}${c.suit}</div>
+                        <div class="card-center">${c.suit}</div>
+                        <div class="card-bottom">${c.rank}${c.suit}</div>
+                    </div>`;
+            });
+            document.getElementById('my-hand').innerHTML = handHtml;
+
+            // زر اللعب
+            let playBtn = document.getElementById('btn-play-selected');
+            if(selectedCardId && isMyTurnToPlay) {
+                playBtn.classList.remove('disabled');
+            } else {
+                playBtn.classList.add('disabled');
+            }
+
+            // رسم أوراق الطاولة
+            let trickHtml = '';
+            gameState.currentTrick.forEach(t => {
+                let posClass = 'tc-bottom';
+                if(t.playerId === gameState.players[partnerIdx].id) posClass = 'tc-top';
+                else if(t.playerId === gameState.players[leftIdx].id) posClass = 'tc-left';
+                else if(t.playerId === gameState.players[rightIdx].id) posClass = 'tc-right';
+
+                trickHtml += `
+                    <div class="playing-card ${t.card.color} trick-card ${posClass}">
+                        <div class="card-top">${t.card.rank}${t.card.suit}</div>
+                        <div class="card-center">${t.card.suit}</div>
+                        <div class="card-bottom">${t.card.rank}${t.card.suit}</div>
+                    </div>`;
+            });
+            document.getElementById('table-trick').innerHTML = trickHtml;
+        }
+
+        function _updatePos(elemId, pIdx, activeId) {
+            let el = document.getElementById(elemId);
+            let p = gameState.players[pIdx];
+            if(!p) return;
+            el.className = `player-pos ${elemId.split('-')[1]} ${(p.id === activeId) ? 'active' : ''}`;
+            let team = pIdx % 2 === 0 ? 'team1' : 'team2';
+            el.innerText = `${p.name}\n(${gameState.trickScores[team]})`;
+        }
+
+        // ==========================================
+        // 4. التفاعلات والنوافذ
+        // ==========================================
+        function selectCard(id, isMyTurn, isValid) {
+            if(!isMyTurn) return showToast("ليس دورك!");
+            if(!isValid) return showToast("يجب أن تلعب من نفس اللون المطلوب!");
+            selectedCardId = (selectedCardId === id) ? null : id;
+            renderGame();
+        }
+
+        function confirmPlayCard() {
+            if(!selectedCardId) return;
+            sendAction({ type: 'play_card', playerId: myId, cardId: selectedCardId });
+            selectedCardId = null;
+        }
+
+        function showFullHandModal() {
+            let me = gameState.players.find(p => p.id === myId);
+            let html = '';
+            me.hand.forEach(c => {
+                html += `
+                    <div class="playing-card ${c.color}">
+                        <div class="card-top">${c.rank}${c.suit}</div>
+                        <div class="card-center" style="font-size:1.2rem;">${c.suit}</div>
+                        <div class="card-bottom">${c.rank}${c.suit}</div>
+                    </div>`;
+            });
+            document.getElementById('full-hand-grid-content').innerHTML = html;
+            showModal('modal-full-hand');
+        }
+
+        function handleModals() {
+            let isMyTurn = (gameState.players[gameState.turnIdx]?.id === myId);
+            
+            closeModal('modal-bid'); closeModal('modal-suit');
+            
+            if(gameState.status === 'bidding' && isMyTurn) {
+                document.getElementById('current-highest-bid').innerText = gameState.highestBid > 6 ? gameState.highestBid : 'لا يوجد';
+                let optsHtml = '';
+                for(let i = Math.max(7, gameState.highestBid + 1); i <= 13; i++) {
+                    optsHtml += `<button class="bid-btn" onclick="submitBid(${i})">${i}</button>`;
+                }
+                document.getElementById('bid-options').innerHTML = optsHtml;
+                showModal('modal-bid');
+            }
+            else if(gameState.status === 'suit_selection' && isMyTurn) {
+                showModal('modal-suit');
+            }
+        }
+
+        function submitBid(val) { sendAction({ type: 'make_bid', playerId: myId, bid: val }); }
+        function submitSuit(suit) { sendAction({ type: 'select_suit', playerId: myId, suit: suit }); }
+
+    </script>
+</body>
+</html>
