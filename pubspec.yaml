@@ -1,5 +1,5 @@
-name: tarneeb_pro_hotspot
-description: Professional Tarneeb Local Game
+name: tajweed_book
+description: كتاب تيسير أحكام التجويد
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  webview_flutter: ^4.7.0
 
 flutter:
   uses-material-design: true
