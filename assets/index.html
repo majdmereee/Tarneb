@@ -2,619 +2,723 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tarneeb Pro Ultimate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>تيسير أحكام التجويد</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a; --surface: #1e293b; --surface-light: #334155;
-            --accent: #38bdf8; --accent-hover: #0ea5e9;
-            --danger: #ef4444; --success: #22c55e;
-            --red-suit: #ef4444; --black-suit: #111;
-            --font: 'Tajawal', sans-serif;
+            --bg-body: #f7f6f2;
+            --bg-card: #ffffff;
+            --text-main: #111111;
+            --text-muted: #333333;
+            --primary: #0f3d2e;
+            --accent: #b31212;
+            --gold: #8a6519;
+            --border-ui: #d1c7b7;
+            --font-size-base: 24px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); user-select: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-
-        /* الأزرار الاحترافية */
-        .btn-pro {
-            background: var(--surface-light); color: white; font-size: 1.1rem; font-weight: 900;
-            padding: 12px 24px; border-radius: 8px; border: 1px solid var(--accent); cursor: pointer;
-            transition: all 0.2s; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        .btn-pro:active { transform: scale(0.95); }
-        .btn-pro.highlight { background: var(--accent); color: var(--bg); border-color: var(--accent-hover); }
-        .btn-pro.disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; color: #888; background: #222; }
 
-        input { width: 100%; padding: 15px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; border: 1px solid #444; background: var(--bg); color: var(--accent); margin-bottom: 20px; text-align: center; }
-
-        .screen { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
-        .screen.active { display: flex; }
-        .center-box { margin: auto; background: var(--surface); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-
-        /* البطاقات (تصغير الحجم) */
-        .playing-card {
-            width: 55px; height: 85px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; padding: 4px;
-            font-size: 1.1rem; font-weight: 900; cursor: pointer; background: #fff;
-            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), border 0.1s; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.5); border: 1px solid #ddd;
+        body {
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: var(--font-size-base);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
         }
-        .playing-card.red { color: var(--red-suit); }
-        .playing-card.black { color: var(--black-suit); }
-        
-        /* التحديد */
-        .playing-card.selected { transform: translateY(-20px) scale(1.1); border: 3px solid var(--accent); z-index: 50 !important; box-shadow: 0 10px 20px rgba(56, 189, 248, 0.6); }
-        .playing-card.disabled { filter: brightness(0.6); cursor: not-allowed; }
 
-        .card-top { align-self: flex-start; line-height: 1; }
-        .card-center { align-self: center; font-size: 1.8rem; }
-        .card-bottom { align-self: flex-end; transform: rotate(180deg); line-height: 1; }
+        /* شريط علوي نحيف ومرتب */
+        header {
+            width: 100%;
+            max-width: 680px;
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 8px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--gold);
+        }
 
-        /* طاولة اللعب (Tarneeb specific Layout) */
-        .hud { display: flex; justify-content: space-between; padding: 10px 20px; background: var(--surface); border-bottom: 1px solid #333; font-weight: bold; font-size: 1rem; align-items: center; }
-        .scoreboard { display: flex; gap: 20px; color: var(--accent); }
-        
-        .table-area { flex: 1; display: grid; grid-template-columns: 1fr 2fr 1fr; grid-template-rows: 1fr 2fr 1fr; position: relative; padding: 10px; }
-        
-        .player-pos { display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; color: #aaa; text-align: center; }
-        .player-pos.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-        .pos-top { grid-column: 2; grid-row: 1; }
-        .pos-left { grid-column: 1; grid-row: 2; }
-        .pos-right { grid-column: 3; grid-row: 2; }
-        .pos-bottom { grid-column: 2; grid-row: 3; }
+        .header-btn {
+            background-color: #ffffff;
+            color: var(--primary);
+            border: none;
+            padding: 6px 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            font-family: 'Tajawal', sans-serif;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-        /* الأوراق الملعوبة على الطاولة */
-        .center-trick { grid-column: 2; grid-row: 2; display: flex; justify-content: center; align-items: center; position: relative; }
-        .trick-card { position: absolute; transform: scale(1.2); }
-        .tc-top { transform: translateY(-40px) scale(1.1); z-index: 1; }
-        .tc-bottom { transform: translateY(40px) scale(1.1); z-index: 4; }
-        .tc-left { transform: translateX(-40px) scale(1.1); z-index: 2; }
-        .tc-right { transform: translateX(40px) scale(1.1); z-index: 3; }
+        .header-btn:active {
+            background-color: #ebdcb9;
+        }
 
-        /* أشرطة التحكم السفلية */
-        .controls-bar { display: flex; justify-content: center; gap: 15px; padding: 10px; background: rgba(0,0,0,0.5); z-index: 100; position: absolute; bottom: 130px; width: 100%; }
-        .hand-container { height: 120px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 20px; overflow-x: auto; background: var(--surface); border-top: 1px solid #444; }
-        .hand-container .playing-card { margin: 0 -15px; }
+        .header-info {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fceecb;
+        }
 
-        /* الموديلات (النوافذ) */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 900; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal.active { display: flex; }
-        
-        .grid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .bid-btn { padding: 15px; font-size: 1.5rem; font-weight: bold; background: var(--surface-light); border: 1px solid #555; color: white; border-radius: 8px; cursor: pointer; }
-        .bid-btn:active { background: var(--accent); }
-        .bid-btn.pass { background: var(--danger); grid-column: span 4; }
+        .font-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        /* عرض كامل الورق */
-        .full-hand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-height: 70vh; overflow-y: auto; }
-        .full-hand-grid .playing-card { margin: 0; width: 60px; height: 90px; }
+        .font-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 6px;
+            width: 36px;
+            height: 34px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: var(--bg); padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; z-index: 1000; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .font-btn:active {
+            background: #ffffff;
+            color: var(--primary);
+        }
+
+        /* حاوية المحتوى */
+        main.book-wrapper {
+            width: 100%;
+            max-width: 680px;
+            padding: 12px 12px 90px 12px;
+            flex-grow: 1;
+        }
+
+        .page-sheet {
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-ui);
+            border-radius: 12px;
+            padding: 18px 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            display: none;
+        }
+
+        .page-sheet.active {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* عناوين الدروس المباشرة الصريحة */
+        h1.lesson-title {
+            color: var(--primary);
+            font-size: 1.6rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e8e2d5;
+            line-height: 1.3;
+        }
+
+        p.text-block {
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        /* الصندوق القرآني المخصص للخط العثماني الواضح */
+        .quran-verse {
+            background-color: #fbf9f4;
+            border: 2px solid #bed3c4;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 12px 0;
+            font-family: 'Amiri Quran', serif;
+            font-size: calc(var(--font-size-base) * 1.15);
+            line-height: 2.2;
+            color: #0b3d2b;
+            text-align: center;
+            direction: rtl;
+        }
+
+        .quran-verse b, .mark-char {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* صناديق القواعد المختصرة */
+        .rule-box {
+            background-color: #f7f9f7;
+            border-right: 5px solid var(--primary);
+            padding: 10px 12px;
+            margin: 10px 0;
+            border-radius: 4px 8px 8px 4px;
+            font-size: 0.95em;
+        }
+
+        .rule-letters {
+            background-color: #eee7d5;
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 1.05em;
+            margin: 4px 0;
+            font-weight: 900;
+        }
+
+        /* شريط سفلي مضغوط وعالي الاستجابة */
+        footer.bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            border-top: 2px solid var(--border-ui);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+            z-index: 100;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .nav-button {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .nav-button:disabled {
+            background-color: #c4d1c9;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .nav-button:active:not(:disabled) {
+            background-color: #08261c;
+        }
+
+        .counter-badge {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #333333;
+        }
+
+        /* نافذة الفهرس */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.65);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            max-height: 85vh;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid var(--gold);
+        }
+
+        .modal-top {
+            background: var(--primary);
+            color: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        .btn-close {
+            background: transparent;
+            color: #ffffff;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            font-weight: 900;
+        }
+
+        .index-items-container {
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .index-link-btn {
+            background: #fbfaf7;
+            border: 1.5px solid #ded5c5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            font-family: 'Tajawal', sans-serif;
+            text-align: right;
+            cursor: pointer;
+            color: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .index-link-btn:active {
+            background-color: #eee3cb;
+        }
     </style>
 </head>
 <body>
 
-    <div id="toast">نظام الطرنيب</div>
-
-    <!-- شاشة الدخول -->
-    <div id="screen-login" class="screen active">
-        <div class="center-box">
-            <h1 style="font-size: 3rem; color: var(--accent); margin-bottom: 5px;">الطرنيب</h1>
-            <h3 style="color: #888; margin-bottom: 20px;">النسخة الاحترافية</h3>
-            <input type="text" id="playerName" placeholder="اسمك..." maxlength="10">
-            <button class="btn-pro highlight" onclick="initNetwork(true)" style="margin-bottom: 10px;">إنشاء طاولة (مضيف)</button>
-            <button class="btn-pro" onclick="initNetwork(false)">انضمام للطاولة</button>
+    <!-- شريط علوي موفر للمساحة وبسيط -->
+    <header>
+        <button class="header-btn" onclick="openIndex()">📖 الفهرس</button>
+        <span class="header-info" id="topPageIndicator">١ من ١٦</span>
+        <div class="font-actions">
+            <button class="font-btn" onclick="modifyFontSize(2)" title="تكبير الخط">A+</button>
+            <button class="font-btn" onclick="modifyFontSize(-2)" title="تصغير الخط">A-</button>
         </div>
-    </div>
+    </header>
 
-    <!-- شاشة الانتظار -->
-    <div id="screen-lobby" class="screen">
-        <div class="center-box">
-            <h2 style="margin-bottom: 20px; color: var(--accent);">غرفة الانتظار (الطرنيب)</h2>
-            <div id="lobby-players" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;"></div>
-            <p id="wait-msg" style="color: var(--danger); font-weight: bold;">بانتظار اكتمال العدد (4 لاعبين حصراً)...</p>
-            <button id="btn-start-game" class="btn-pro highlight" style="display: none;" onclick="startGame()">توزيع الورق وبدء اللعب</button>
-        </div>
-    </div>
+    <!-- مساحة الدروس المباشرة -->
+    <main class="book-wrapper" id="bookWrapper">
 
-    <!-- شاشة اللعب -->
-    <div id="screen-game" class="screen">
-        <div class="hud">
-            <div class="scoreboard">
-                <div>لنا (فريق 1): <span id="score-team1" style="color:white; font-size:1.2rem;">0</span></div>
-                <div>لهم (فريق 2): <span id="score-team2" style="color:white; font-size:1.2rem;">0</span></div>
+        <!-- 1 -->
+        <article class="page-sheet active" id="p1">
+            <h1 class="lesson-title">النون الساكنة والتنوين</h1>
+            <p class="text-block">النون الساكنة (نْ) والتنوين ( ً ٍ ٌ ) عند التلاوة لهما ٤ أحكام رئيسية:</p>
+            <div class="rule-box">
+                ١- الإظهار الحلقي.<br>
+                ٢- الإدغام (بغنة - بغير غنة).<br>
+                ٣- الإقلاب.<br>
+                ٤- الإخفاء.
             </div>
-            <div style="text-align: left;">
-                <div style="color:#aaa; font-size:0.8rem;">الطرنيب: <span id="hud-tarneeb" style="color:white; font-size:1.2rem;">-</span></div>
-                <div style="color:#aaa; font-size:0.8rem;">الطلبة: <span id="hud-bid" style="color:white; font-size:1.2rem;">-</span></div>
+            <div class="quran-verse">
+                مثال تنوين: ﴿سَمِي<b>عٌۢ بَـ</b>صِيرٌ﴾<br>
+                مثال نون: ﴿مِ<b>نْ خَـ</b>وْفٍ﴾
             </div>
-        </div>
-        
-        <div class="table-area">
-            <div class="player-pos pos-top" id="pos-top">الزميل</div>
-            <div class="player-pos pos-left" id="pos-left">خصم يسار</div>
-            <div class="player-pos pos-right" id="pos-right">خصم يمين</div>
-            
-            <div class="center-trick" id="table-trick">
-                <!-- الأوراق الأربعة الملعوبة -->
+        </article>
+
+        <!-- 2 -->
+        <article class="page-sheet" id="p2">
+            <h1 class="lesson-title">الإظهار الحلقي</h1>
+            <p class="text-block">نطق النون أو التنوين بوضوح تام وبدون أي غنة زائدة إذا جاء بعدها أحد الحروف الستة:</p>
+            <div class="rule-box" style="text-align: center;">
+                <span class="rule-letters">ء - هـ - ع - ح - غ - خ</span>
             </div>
-            
-            <div class="player-pos pos-bottom" id="pos-bottom" style="color: var(--accent);">أنت</div>
-        </div>
-
-        <!-- أزرار التحكم بالتحديد -->
-        <div class="controls-bar" id="controls-bar">
-            <button class="btn-pro" onclick="showFullHandModal()">👀 عرض كامل الورق</button>
-            <button class="btn-pro highlight disabled" id="btn-play-selected" onclick="confirmPlayCard()">لعب الورقة المختارة 👆</button>
-        </div>
-
-        <div class="hand-container" id="my-hand"></div>
-    </div>
-
-    <!-- نافذة الطلبة (Bidding) -->
-    <div class="modal" id="modal-bid">
-        <div class="center-box">
-            <h2 style="color: var(--accent); margin-bottom: 10px;">دورك في الطلبة</h2>
-            <p style="color: #aaa; margin-bottom: 20px;">أعلى طلبة حالياً: <span id="current-highest-bid" style="color:white; font-weight:bold;">لا يوجد</span></p>
-            <div class="grid-options" id="bid-options">
-                <!-- أزرار 7 إلى 13 تولد عبر JS -->
+            <div class="quran-verse">
+                ﴿مِ<b>نْ هَـ</b>ادٍ﴾<br>
+                ﴿مِ<b>نْ خَـ</b>وْفٍ﴾<br>
+                ﴿عَلِي<b>مٌ حَـ</b>كِيمٌ﴾<br>
+                ﴿جَنَّـ<b>اتٍ أَلْـ</b>فَافاً﴾
             </div>
-            <button class="bid-btn pass" onclick="submitBid(0)">باس (Pass)</button>
-        </div>
-    </div>
+        </article>
 
-    <!-- نافذة اختيار الطرنيب -->
-    <div class="modal" id="modal-suit">
-        <div class="center-box">
-            <h2 style="color: var(--success); margin-bottom: 20px;">لقد فزت بالطلبة! اختر الطرنيب</h2>
-            <div class="grid-options" style="grid-template-columns: repeat(2, 1fr);">
-                <button class="bid-btn" style="color:var(--red-suit);" onclick="submitSuit('♥')">♥ كبة</button>
-                <button class="bid-btn" style="color:var(--red-suit);" onclick="submitSuit('♦')">♦ ديناري</button>
-                <button class="bid-btn" style="color:var(--black-suit);" onclick="submitSuit('♣')">♣ سباتي</button>
-                <button class="bid-btn" style="color:var(--black-suit);" onclick="submitSuit('♠')">♠ بستوني</button>
+        <!-- 3 -->
+        <article class="page-sheet" id="p3">
+            <h1 class="lesson-title">الإدغام بغنة</h1>
+            <p class="text-block">دمج النون الساكنة أو التنوين بالحرف الذي بعدها مع صوت غنة يخرج من الأنف بمقدار حركتين:</p>
+            <div class="rule-box" style="text-align: center;">
+                حروفه مجموعة في كلمة: <span class="rule-letters">يَنْمُو</span>
             </div>
-        </div>
-    </div>
+            <div class="quran-verse">
+                ﴿مَ<b>ن يَّـ</b>قُولُ﴾ ➔ تُقرأ: (مَيَّقُول)<br>
+                ﴿مِ<b>ن مَّـ</b>الٍ﴾ ➔ تُقرأ: (مِمَّال)<br>
+                ﴿مِ<b>ن نِّـ</b>عْمَةٍ﴾<br>
+                ﴿وُجُـ<b>وهٌ يَّـ</b>وْمَئِذٍ﴾
+            </div>
+        </article>
 
-    <!-- عرض كامل الورق -->
-    <div class="modal" id="modal-full-hand">
-        <div class="center-box" style="max-width: 600px; background: rgba(30,41,59,0.95);">
-            <h2 style="color: var(--accent); margin-bottom: 20px;">أوراقي بالكامل</h2>
-            <div class="full-hand-grid" id="full-hand-grid-content"></div>
-            <button class="btn-pro" style="margin-top: 20px; width: 100%;" onclick="closeModal('modal-full-hand')">إغلاق</button>
+        <!-- 4 -->
+        <article class="page-sheet" id="p4">
+            <h1 class="lesson-title">الإدغام بغير غنة</h1>
+            <p class="text-block">إدخال النون الساكنة أو التنوين بالكامل في الحرف التالي دون إصدار أي صوت أنفي:</p>
+            <div class="rule-box" style="text-align: center;">
+                حرفاه هما: <span class="rule-letters">اللام (ل) - الراء (ر)</span>
+            </div>
+            <div class="quran-verse">
+                ﴿مِ<b>ن لَّـ</b>دُنَّا﴾ ➔ تُقرأ: (مِلَّدُنَّا)<br>
+                ﴿مِ<b>ن رَّ‌</b>بِّهِمْ﴾ ➔ تُقرأ: (مِرَّبِّهِمْ)<br>
+                ﴿غَفُـ<b>ورٌ رَّ‌</b>حِيمٌ﴾ ➔ تُقرأ: (غَفُورُرَّحِيم)
+            </div>
+        </article>
+
+        <!-- 5 -->
+        <article class="page-sheet" id="p5">
+            <h1 class="lesson-title">الإقلاب</h1>
+            <p class="text-block">قلب النون الساكنة أو التنوين إلى (ميم خفيفة) مع غنة إذا جاء بعدها حرف الباء فقط:</p>
+            <div class="rule-box" style="text-align: center;">
+                حرفه الوحيد: <span class="rule-letters">الباء (ب)</span>
+            </div>
+            <div class="quran-verse">
+                ﴿مِ<b>نۢ بَـ</b>عْدِ﴾ ➔ تُقرأ: (مِمْبَعْد)<br>
+                ﴿أَنۢ بُـورِكَ﴾ ➔ تُقرأ: (أَمْبُورِك)<br>
+                ﴿عَلِي<b>مٌۢ بِـ</b>ذَاتِ الصُّدُورِ﴾
+            </div>
+            <p class="text-block">تجد في المصحف حرف ميم صغير ( <b>مـ</b> ) دلالة على الإقلاب.</p>
+        </article>
+
+        <!-- 6 -->
+        <article class="page-sheet" id="p6">
+            <h1 class="lesson-title">الإخفاء</h1>
+            <p class="text-block">ستر مخرج النون ونطقها بين الإظهار والإدغام مع بقاء الغنة عند بقية الحروف الـ ١٥:</p>
+            <div class="rule-box" style="text-align: center;">
+                <span class="rule-letters">ص - ذ - ث - ك - ج - ش - ق - س - د - ط - ز - ف - ت - ض - ظ</span>
+            </div>
+            <div class="quran-verse">
+                ﴿مِ<b>ن قَـ</b>بْلُ﴾<br>
+                ﴿مِ<b>ن دُ</b>ونِ﴾<br>
+                ﴿أَ<b>نتُمْ</b>﴾<br>
+                ﴿كِتَـ<b>ابٌ كَـ</b>رِيمٌ﴾
+            </div>
+        </article>
+
+        <!-- 7 -->
+        <article class="page-sheet" id="p7">
+            <h1 class="lesson-title">الميم والنون المشددتان</h1>
+            <p class="text-block">أي نون أو ميم فوقها شدة، يجب مَد الصوت فيها بغنة كاملة بمقدار حركتين وصلاً ووقفاً:</p>
+            <div class="rule-box" style="text-align: center;">
+                <span class="rule-letters">( نّ ) - ( مّ )</span>
+            </div>
+            <div class="quran-verse">
+                ﴿إِ<b>نَّ</b> اللَّهَ مَعَ الصَّابِرِينَ﴾<br>
+                ﴿قُلْ أَعُوذُ بِرَبِّ ال<b>نَّـ</b>اسِ﴾<br>
+                ﴿عَ<b>مَّ</b> يَتَسَاءَلُونَ﴾<br>
+                ﴿فَأَ<b>مَّـ</b>ا مَنْ أَعْطَىٰ﴾
+            </div>
+        </article>
+
+        <!-- 8 -->
+        <article class="page-sheet" id="p8">
+            <h1 class="lesson-title">الميم الساكنة</h1>
+            <p class="text-block">الميم الخالية من الحركة (مْ) لها ثلاثة أحكام فقط بحسب الحرف الذي بعدها:</p>
+            <div class="rule-box">
+                ١- <b>إخفاء شفوي:</b> مع حرف (الباء).<br>
+                ٢- <b>إدغام مثلين:</b> مع حرف (الميم).<br>
+                ٣- <b>إظهار شفوي:</b> مع باقي الحروف كلها.
+            </div>
+            <div class="quran-verse">
+                ﴿تَرْمِيهِ<b>م بِـ</b>حِجَارَةٍ﴾ (إخفاء)<br>
+                ﴿لَهُ<b>م مَّـ</b>ا يَشَاءُونَ﴾ (إدغام)<br>
+                ﴿أَنْعَمْـ<b>تَ</b> عَلَيْهِمْ﴾ (إظهار)
+            </div>
+        </article>
+
+        <!-- 9 -->
+        <article class="page-sheet" id="p9">
+            <h1 class="lesson-title">القلقلة</h1>
+            <p class="text-block">اضطراب واهتزاز صوت الحرف عند سكونه ليظهر قوياً جلياً:</p>
+            <div class="rule-box" style="text-align: center;">
+                حروفها: <span class="rule-letters">قُطْبُ جَدٍّ (ق - ط - ب - ج - د)</span>
+            </div>
+            <div class="quran-verse">
+                عند الوقف (كبرى قوية):<br>
+                ﴿قُلْ هُوَ اللَّهُ أَحَ<b>دْ</b>﴾ - ﴿الفَلَ<b>قْ</b>﴾<br><br>
+                في وسط الكلمة (صغرى):<br>
+                ﴿يَ<b>قْـ</b>طَعُونَ﴾ - ﴿يَ<b>طْـ</b>مَعُ﴾ - ﴿تَ<b>جْـ</b>رِي﴾
+            </div>
+        </article>
+
+        <!-- 10 -->
+        <article class="page-sheet" id="p10">
+            <h1 class="lesson-title">المد الطبيعي</h1>
+            <p class="text-block">هو مد حروف المد الثلاثة (الألف، الواو، الياء) بدون زيادة ولا نقصان لعدم وجود همز أو سكون:</p>
+            <div class="rule-box" style="text-align: center;">
+                مقداره: <b>حركتان فقط</b> (بقدر نطق حرفين متتاليين)
+            </div>
+            <div class="quran-verse">
+                ﴿قَ<b>ـا</b>لَ﴾<br>
+                ﴿يَقُ<b>ـو</b>لُ﴾<br>
+                ﴿قِ<b>ـيـ</b>لَ﴾
+            </div>
+        </article>
+
+        <!-- 11 -->
+        <article class="page-sheet" id="p11">
+            <h1 class="lesson-title">المد الواجب المتصل</h1>
+            <p class="text-block">أن يقع حرف المد وتليه الهمزة مباشرة في كلمة واحدة:</p>
+            <div class="rule-box" style="text-align: center;">
+                حكمه ومقداره: <b>واجب المد (٤ أو ٥ حركات)</b>
+            </div>
+            <div class="quran-verse">
+                ﴿إِذَا جَ<b>آ</b>ءَ نَصْرُ اللَّهِ﴾<br>
+                ﴿وَالسَّمَ<b>آ</b>ءِ ذَاتِ الْبُرُوجِ﴾<br>
+                ﴿سُو<b>ٓ</b>ءَ الْعَذَابِ﴾
+            </div>
+            <p class="text-block">توضع فوق الحرف علامة المد ( ~ ) في المصحف.</p>
+        </article>
+
+        <!-- 12 -->
+        <article class="page-sheet" id="p12">
+            <h1 class="lesson-title">المد الجائز المنفصل</h1>
+            <p class="text-block">أن يكون حرف المد في نهاية الكلمة الأولى، وتأتي الهمزة في بداية الكلمة التالية مباشرة:</p>
+            <div class="rule-box" style="text-align: center;">
+                مقداره: <b>يُمَد ٤ أو ٥ حركات</b>
+            </div>
+            <div class="quran-verse">
+                ﴿إِنَّ<b>ـآ أَنْـ</b>زَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ﴾<br>
+                ﴿يَ<b>ـآ أَيُّـ</b>هَا الَّذِينَ آمَنُوا﴾<br>
+                ﴿قُـ<b>ـوٓا أَنـ</b>فُسَكُمْ﴾
+            </div>
+        </article>
+
+        <!-- 13 -->
+        <article class="page-sheet" id="p13">
+            <h1 class="lesson-title">المد العارض للسكون</h1>
+            <p class="text-block">أن يأتي حرف المد قبل الحرف الأخير في الكلمة التي نقف عليها عند رأس الآية:</p>
+            <div class="rule-box" style="text-align: center;">
+                مقداره: <b>يجوز حركتان أو ٤ أو ٦ (الأيسر التوسط ٤)</b>
+            </div>
+            <div class="quran-verse">
+                ﴿الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِ<b>ـينْ</b>﴾<br>
+                ﴿إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِ<b>ـينْ</b>﴾<br>
+                ﴿مَالِكِ يَوْمِ الدِّ<b>يـنْ</b>﴾
+            </div>
+        </article>
+
+        <!-- 14 -->
+        <article class="page-sheet" id="p14">
+            <h1 class="lesson-title">المد اللازم</h1>
+            <p class="text-block">أن يأتي بعد حرف المد سكون أصلي دائم أو حرف مشدد، وهو أطول المدود:</p>
+            <div class="rule-box" style="text-align: center;">
+                مقداره: <b>٦ حركات كاملة دون زيادة أو نقصان</b>
+            </div>
+            <div class="quran-verse">
+                ﴿وَلَا الضَّ<b>ـآلِّـ</b>ينَ﴾<br>
+                ﴿الْحَ<b>ـآقَّـ</b>ةُ﴾<br>
+                الحروف المقطعة: ﴿<b>قٓ</b>﴾ - ﴿<b>نٓ</b>﴾ - ﴿ال<b>ـمٓ</b>﴾
+            </div>
+        </article>
+
+        <!-- 15 -->
+        <article class="page-sheet" id="p15">
+            <h1 class="lesson-title">تفخيم وترقيق الراء</h1>
+            <p class="text-block">حرف الراء له حالتان حسب حركته المباشرة:</p>
+            <div class="rule-box">
+                <b>١- تفخيم (صوت سميك):</b> إذا كانت مفتوحة أو مضمومة.<br>
+                <b>٢- ترقيق (صوت نحيف):</b> إذا كانت مكسورة.
+            </div>
+            <div class="quran-verse">
+                تفخيم: ﴿<b>رَ</b>حْمَةٌ﴾ - ﴿<b>رُ</b>زِقْنَا﴾<br>
+                ترقيق: ﴿<b>رِ</b>جَالٌ﴾ - ﴿فِـ<b>ـرْ</b>عَوْنَ﴾
+            </div>
+        </article>
+
+        <!-- 16 -->
+        <article class="page-sheet" id="p16">
+            <h1 class="lesson-title">علامات الوقف في المصحف</h1>
+            <p class="text-block">إشارات صغيرة فوق الكلمات لضبط التوقف والوصل:</p>
+            <div class="rule-box">
+                <b>( مـ ):</b> وقف لازم (يجب الوقوف).<br>
+                <b>( لا ):</b> لا تقف (واصل القراءة).<br>
+                <b>( ج ):</b> وقف جائز (قف أو واصل كما تحب).<br>
+                <b>( صلى ):</b> الوصل أفضل وأولى.<br>
+                <b>( قلى ):</b> الوقف أفضل وأولى.
+            </div>
+            <div class="quran-verse" style="font-size: 1.1em; color: var(--primary);">
+                ﴿فَتَوَلَّ عَنْهُمْ ۘ <b>يَوْمَ يَدْعُ الدَّاعِ</b>﴾
+            </div>
+        </article>
+
+    </main>
+
+    <!-- شريط سفلي متين ومناسب جداً للضغط السريع -->
+    <footer class="bottom-bar">
+        <button class="nav-button" id="prevBtn" onclick="turnPage(-1)">
+            السابق ⬅
+        </button>
+        <span class="counter-badge" id="bottomPageIndicator">١ / ١٦</span>
+        <button class="nav-button" id="nextBtn" onclick="turnPage(1)">
+            ➡ التالي
+        </button>
+    </footer>
+
+    <!-- نافذة الفهرس السريع بخط كبير -->
+    <div class="modal-overlay" id="indexModal" onclick="closeIndexBackdrop(event)">
+        <div class="modal-box">
+            <div class="modal-top">
+                <span>فهرس الدروس السريع</span>
+                <button class="btn-close" onclick="closeIndex()">✕</button>
+            </div>
+            <div class="index-items-container" id="indexContainer"></div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // ثوابت ومحرك ورق الطرنيب
-        // ==========================================
-        const SUITS = [{s:'♥', c:'red'}, {s:'♦', c:'red'}, {s:'♣', c:'black'}, {s:'♠', c:'black'}];
-        const RANKS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']; // من الأضعف للأقوى
-        
-        let ws;
-        let myId = Math.random().toString(36).substr(2, 9);
-        let myName = "";
-        let isHost = false;
-        
-        let selectedCardId = null;
+        const total = 16;
+        let activePage = 1;
+        let fontSize = parseInt(localStorage.getItem('preferred_font_size')) || 24;
 
-        // حالة اللعبة المركزية (State Machine)
-        let gameState = {
-            status: 'waiting', // waiting, bidding, suit_selection, playing, scoring
-            players: [], // 0 & 2 (Team 1), 1 & 3 (Team 2)
-            turnIdx: 0, 
-            dealerIdx: 0,
-            
-            // متغيرات الطلبة
-            bids: [], // من طلب ماذا
-            highestBid: 0,
-            highestBidderIdx: -1,
-            passCount: 0,
-            
-            tarneebSuit: '',
-            
-            // متغيرات اللعب
-            currentTrick: [], // الأوراق الملعوبة في هذه الدورة {playerId, card}
-            trickScores: { team1: 0, team2: 0 }, // الأكلات المجمعة في هذه الجولة
-            gameScores: { team1: 0, team2: 0 }, // النقاط الكلية (حتى 31)
-            leadingSuit: '' // نوع الورقة التي لُعبت أولاً في الدورة
+        const lessonList = [
+            "النون الساكنة والتنوين",
+            "الإظهار الحلقي",
+            "الإدغام بغنة",
+            "الإدغام بغير غنة",
+            "الإقلاب",
+            "الإخفاء",
+            "الميم والنون المشددتان",
+            "الميم الساكنة",
+            "القلقلة",
+            "المد الطبيعي",
+            "المد الواجب المتصل",
+            "المد الجائز المنفصل",
+            "المد العارض للسكون",
+            "المد اللازم",
+            "تفخيم وترقيق الراء",
+            "علامات الوقف في المصحف"
+        ];
+
+        function setFontSize(val) {
+            fontSize = Math.min(Math.max(val, 20), 38);
+            document.documentElement.style.setProperty('--font-size-base', fontSize + 'px');
+            localStorage.setItem('preferred_font_size', fontSize);
+        }
+
+        function modifyFontSize(diff) {
+            setFontSize(fontSize + diff);
+        }
+
+        function toArabicNumbers(n) {
+            const arr = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return n.toString().split('').map(d => arr[parseInt(d)]).join('');
+        }
+
+        function refreshPage() {
+            for (let i = 1; i <= total; i++) {
+                const p = document.getElementById('p' + i);
+                if (p) p.classList.remove('active');
+            }
+
+            const cur = document.getElementById('p' + activePage);
+            if (cur) cur.classList.add('active');
+
+            const arCurrent = toArabicNumbers(activePage);
+            const arTotal = toArabicNumbers(total);
+
+            document.getElementById('topPageIndicator').innerText = `${arCurrent} من ${arTotal}`;
+            document.getElementById('bottomPageIndicator').innerText = `${arCurrent} / ${arTotal}`;
+
+            document.getElementById('prevBtn').disabled = (activePage === 1);
+            document.getElementById('nextBtn').disabled = (activePage === total);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function turnPage(delta) {
+            const target = activePage + delta;
+            if (target >= 1 && target <= total) {
+                activePage = target;
+                refreshPage();
+            }
+        }
+
+        function jumpTo(pageNum) {
+            if (pageNum >= 1 && pageNum <= total) {
+                activePage = pageNum;
+                refreshPage();
+                closeIndex();
+            }
+        }
+
+        function renderIndex() {
+            const container = document.getElementById('indexContainer');
+            container.innerHTML = '';
+            lessonList.forEach((name, index) => {
+                const num = index + 1;
+                const btn = document.createElement('div');
+                btn.className = 'index-link-btn';
+                btn.innerHTML = `<span>${toArabicNumbers(num)}. ${name}</span> <span>⬅</span>`;
+                btn.onclick = () => jumpTo(num);
+                container.appendChild(btn);
+            });
+        }
+
+        function openIndex() {
+            document.getElementById('indexModal').style.display = 'flex';
+        }
+
+        function closeIndex() {
+            document.getElementById('indexModal').style.display = 'none';
+        }
+
+        function closeIndexBackdrop(e) {
+            if (e.target.id === 'indexModal') closeIndex();
+        }
+
+        // سحب الشاشة للتنقل بالإصبع
+        let startX = 0;
+        let endX = 0;
+
+        document.addEventListener('touchstart', e => {
+            startX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', e => {
+            endX = e.changedTouches[0].screenX;
+            if (endX < startX - 60) turnPage(1);   // سحب لليسار = التالي
+            if (endX > startX + 60) turnPage(-1);  // سحب لليمين = السابق
+        }, { passive: true });
+
+        window.onload = function() {
+            setFontSize(fontSize);
+            renderIndex();
+            refreshPage();
         };
-
-        // ==========================================
-        // وظائف الواجهة المساعدة
-        // ==========================================
-        function showToast(msg) {
-            let t = document.getElementById('toast');
-            t.innerText = msg; t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
-        function switchScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        function showModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        // ==========================================
-        // 1. إدارة الشبكة
-        // ==========================================
-        function initNetwork(asHost) {
-            let nameInput = document.getElementById('playerName').value.trim();
-            if(!nameInput) return showToast("الاسم مطلوب للعب!");
-            myName = nameInput; isHost = asHost;
-            
-            if(isHost) {
-                gameState.players.push({ id: myId, name: myName, hand: [] });
-            }
-
-            ws = new WebSocket(`ws://${location.host}/ws`);
-            ws.onopen = () => {
-                switchScreen('screen-lobby');
-                ws.send(JSON.stringify({ type: 'join', id: myId, name: myName }));
-                if(isHost) renderLobby();
-            };
-
-            ws.onmessage = (e) => {
-                let data = JSON.parse(e.data);
-                
-                if (isHost && data.type === 'join' && data.id !== myId) {
-                    if(gameState.players.length < 4) {
-                        gameState.players.push({ id: data.id, name: data.name, hand: [] });
-                        broadcastState();
-                    }
-                } else if (isHost && data.type === 'action') {
-                    processAction(data.actionData);
-                } else if (data.type === 'state_update') {
-                    gameState = data.state;
-                    handleStateChange();
-                }
-            };
-        }
-
-        function broadcastState() {
-            if(!isHost) return;
-            ws.send(JSON.stringify({ type: 'state_update', state: gameState }));
-            handleStateChange(); // تحديث المضيف
-        }
-
-        function handleStateChange() {
-            if(gameState.status === 'waiting') {
-                renderLobby();
-            } else {
-                renderGame();
-                handleModals();
-            }
-        }
-
-        function renderLobby() {
-            let html = '';
-            gameState.players.forEach((p, idx) => { 
-                let team = (idx % 2 === 0) ? '(فريق 1)' : '(فريق 2)';
-                html += `<div style="background: var(--surface-light); padding: 15px; border-radius: 8px; border: 1px solid #444;">👤 ${p.name} <span style="color:#aaa; font-size:0.9rem;">${team}</span></div>`; 
-            });
-            document.getElementById('lobby-players').innerHTML = html;
-            
-            if(isHost) {
-                let btn = document.getElementById('btn-start-game');
-                let msg = document.getElementById('wait-msg');
-                if(gameState.players.length === 4) {
-                    btn.style.display = 'block'; msg.style.display = 'none';
-                } else {
-                    btn.style.display = 'none'; msg.style.display = 'block';
-                    msg.innerText = `العدد الحالي: ${gameState.players.length}/4 ...`;
-                }
-            }
-        }
-
-        // ==========================================
-        // 2. محرك الطرنيب (Host Logic)
-        // ==========================================
-        function startGame() {
-            if(gameState.players.length !== 4) return;
-            gameState.gameScores = { team1: 0, team2: 0 };
-            gameState.dealerIdx = Math.floor(Math.random() * 4);
-            startRound();
-        }
-
-        function startRound() {
-            // توليد وخلط الـ 52 ورقة
-            let deck = [];
-            SUITS.forEach(suit => { RANKS.forEach(rank => { deck.push({ id: rank+suit.s, rank: rank, suit: suit.s, color: suit.c }); }); });
-            deck = deck.sort(() => Math.random() - 0.5);
-
-            gameState.players.forEach(p => p.hand = []);
-            let pIdx = 0;
-            while(deck.length > 0) {
-                gameState.players[pIdx].hand.push(deck.pop());
-                pIdx = (pIdx + 1) % 4;
-            }
-
-            // ترتيب الأوراق في اليد بقوة
-            gameState.players.forEach(p => {
-                p.hand.sort((a, b) => {
-                    if(a.suit === b.suit) return RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank);
-                    return SUITS.findIndex(s=>s.s===a.suit) - SUITS.findIndex(s=>s.s===b.suit);
-                });
-            });
-
-            // إعادة ضبط متغيرات الجولة
-            gameState.status = 'bidding';
-            gameState.bids = [0,0,0,0];
-            gameState.highestBid = 6; // الحد الأدنى للطلبة 7
-            gameState.highestBidderIdx = -1;
-            gameState.passCount = 0;
-            gameState.tarneebSuit = '';
-            gameState.trickScores = { team1: 0, team2: 0 };
-            gameState.currentTrick = [];
-            
-            // يبدأ الطلبة اللاعب الذي يمين الموزع (أو بعده)
-            gameState.turnIdx = (gameState.dealerIdx + 1) % 4;
-            
-            broadcastState();
-        }
-
-        function processAction(act) {
-            let activeP = gameState.players[gameState.turnIdx];
-            if(act.playerId !== activeP.id) return; // حماية الأدوار الصارمة
-
-            if(gameState.status === 'bidding' && act.type === 'make_bid') {
-                if(act.bid === 0) { // Pass
-                    gameState.passCount++;
-                } else if (act.bid > gameState.highestBid) {
-                    gameState.highestBid = act.bid;
-                    gameState.highestBidderIdx = gameState.turnIdx;
-                    gameState.passCount = 0; // تصفير الباس عند طلبة جديدة
-                }
-
-                if(gameState.passCount === 3 && gameState.highestBidderIdx !== -1) {
-                    // فاز أحدهم
-                    gameState.status = 'suit_selection';
-                    gameState.turnIdx = gameState.highestBidderIdx;
-                } else if (gameState.passCount === 4) {
-                    // الكل باس -> إعادة توزيع
-                    gameState.dealerIdx = (gameState.dealerIdx + 1) % 4;
-                    startRound();
-                    return;
-                } else {
-                    // انتقال الدور للطلبة التالية
-                    gameState.turnIdx = (gameState.turnIdx + 1) % 4;
-                }
-                broadcastState();
-            }
-            else if (gameState.status === 'suit_selection' && act.type === 'select_suit') {
-                gameState.tarneebSuit = act.suit;
-                gameState.status = 'playing';
-                // يبدأ اللعب من فاز بالطلبة
-                gameState.turnIdx = gameState.highestBidderIdx;
-                broadcastState();
-            }
-            else if (gameState.status === 'playing' && act.type === 'play_card') {
-                let p = gameState.players.find(pl => pl.id === act.playerId);
-                let cIdx = p.hand.findIndex(c => c.id === act.cardId);
-                let card = p.hand[cIdx];
-
-                // حماية الخداع: يجب اللعب من نفس النوع إذا توفر
-                if(gameState.currentTrick.length > 0) {
-                    let leadSuit = gameState.currentTrick[0].card.suit;
-                    let hasLeadSuit = p.hand.some(c => c.suit === leadSuit);
-                    if(hasLeadSuit && card.suit !== leadSuit) return; // لعب غير شرعي!
-                } else {
-                    gameState.leadingSuit = card.suit; // تحديد نوع الأكلة
-                }
-
-                p.hand.splice(cIdx, 1);
-                gameState.currentTrick.push({ playerId: p.id, card: card });
-                
-                if(gameState.currentTrick.length === 4) {
-                    // تقييم الأكلة
-                    gameState.turnIdx = -1; // إيقاف اللعب مؤقتاً
-                    broadcastState();
-                    setTimeout(() => evaluateTrick(), 2000); // عرض الأوراق ثانيتين ثم جمعها
-                } else {
-                    gameState.turnIdx = (gameState.turnIdx + 1) % 4;
-                    broadcastState();
-                }
-            }
-        }
-
-        function evaluateTrick() {
-            let leadSuit = gameState.currentTrick[0].card.suit;
-            let tarneeb = gameState.tarneebSuit;
-            let winningCard = gameState.currentTrick[0];
-
-            for(let i=1; i<4; i++) {
-                let c = gameState.currentTrick[i];
-                let isCurrentTarneeb = (c.card.suit === tarneeb);
-                let isWinningTarneeb = (winningCard.card.suit === tarneeb);
-
-                if(isCurrentTarneeb && !isWinningTarneeb) {
-                    winningCard = c; // طرنيب يقطع أي شيء
-                } else if (isCurrentTarneeb && isWinningTarneeb) {
-                    if(RANKS.indexOf(c.card.rank) > RANKS.indexOf(winningCard.card.rank)) winningCard = c;
-                } else if (c.card.suit === leadSuit && !isWinningTarneeb) {
-                    if(RANKS.indexOf(c.card.rank) > RANKS.indexOf(winningCard.card.rank)) winningCard = c;
-                }
-            }
-
-            // إعطاء النقطة للفريق الفائز
-            let winnerIdx = gameState.players.findIndex(p => p.id === winningCard.playerId);
-            if(winnerIdx === 0 || winnerIdx === 2) gameState.trickScores.team1++;
-            else gameState.trickScores.team2++;
-
-            gameState.currentTrick = [];
-            
-            // التحقق من انتهاء الجولة
-            if(gameState.players[0].hand.length === 0) {
-                evaluateRound();
-            } else {
-                gameState.turnIdx = winnerIdx; // الفائز يبدأ
-                broadcastState();
-            }
-        }
-
-        function evaluateRound() {
-            let reqBid = gameState.highestBid;
-            let bidTeam = (gameState.highestBidderIdx === 0 || gameState.highestBidderIdx === 2) ? 1 : 2;
-            
-            if(bidTeam === 1) {
-                if(gameState.trickScores.team1 >= reqBid) gameState.gameScores.team1 += gameState.trickScores.team1;
-                else gameState.gameScores.team1 -= reqBid;
-                gameState.gameScores.team2 += gameState.trickScores.team2;
-            } else {
-                if(gameState.trickScores.team2 >= reqBid) gameState.gameScores.team2 += gameState.trickScores.team2;
-                else gameState.gameScores.team2 -= reqBid;
-                gameState.gameScores.team1 += gameState.trickScores.team1;
-            }
-
-            // فحص الفوز باللعبة الكلية (31 نقطة)
-            if(gameState.gameScores.team1 >= 31 || gameState.gameScores.team2 >= 31) {
-                gameState.status = 'finished';
-            } else {
-                gameState.dealerIdx = (gameState.dealerIdx + 1) % 4;
-                startRound();
-            }
-            broadcastState();
-        }
-
-        // ==========================================
-        // 3. التقديم والواجهة (Client Rendering)
-        // ==========================================
-        function sendAction(data) {
-            if(isHost) processAction(data);
-            else ws.send(JSON.stringify({ type: 'action', actionData: data }));
-        }
-
-        function renderGame() {
-            switchScreen('screen-game');
-            let meIdx = gameState.players.findIndex(p => p.id === myId);
-            let me = gameState.players[meIdx];
-            let activePlayer = gameState.players[gameState.turnIdx];
-
-            // HUD
-            document.getElementById('score-team1').innerText = gameState.gameScores.team1;
-            document.getElementById('score-team2').innerText = gameState.gameScores.team2;
-            document.getElementById('hud-tarneeb').innerText = gameState.tarneebSuit || '-';
-            document.getElementById('hud-bid').innerText = gameState.highestBid > 6 ? gameState.highestBid : '-';
-
-            // توزيع اللاعبين على الطاولة (أنت دائماً بالأسفل)
-            let partnerIdx = (meIdx + 2) % 4;
-            let rightIdx = (meIdx + 3) % 4; // يمينك
-            let leftIdx = (meIdx + 1) % 4; // يسارك
-
-            _updatePos('pos-top', partnerIdx, activePlayer?.id);
-            _updatePos('pos-left', leftIdx, activePlayer?.id);
-            _updatePos('pos-right', rightIdx, activePlayer?.id);
-            document.getElementById('pos-bottom').className = `player-pos pos-bottom ${(activePlayer?.id === myId) ? 'active' : ''}`;
-            document.getElementById('pos-bottom').innerText = `أنت (${gameState.trickScores[meIdx%2===0?'team1':'team2']} أكلات)`;
-
-            // رسم الأوراق في اليد
-            let isMyTurnToPlay = (gameState.status === 'playing' && activePlayer?.id === myId);
-            let handHtml = '';
-            let leadSuit = gameState.currentTrick.length > 0 ? gameState.currentTrick[0].card.suit : null;
-            let hasLeadSuit = me.hand.some(c => c.suit === leadSuit);
-
-            me.hand.forEach((c, idx) => {
-                let valid = true;
-                if(isMyTurnToPlay && leadSuit && hasLeadSuit && c.suit !== leadSuit) valid = false; // إجبار
-
-                let isSel = (selectedCardId === c.id) ? 'selected' : '';
-                let dis = (!isMyTurnToPlay || !valid) ? 'disabled' : '';
-                
-                handHtml += `
-                    <div class="playing-card ${c.color} ${isSel} ${dis}" style="z-index:${idx}" onclick="selectCard('${c.id}', ${isMyTurnToPlay}, ${valid})">
-                        <div class="card-top">${c.rank}${c.suit}</div>
-                        <div class="card-center">${c.suit}</div>
-                        <div class="card-bottom">${c.rank}${c.suit}</div>
-                    </div>`;
-            });
-            document.getElementById('my-hand').innerHTML = handHtml;
-
-            // زر اللعب
-            let playBtn = document.getElementById('btn-play-selected');
-            if(selectedCardId && isMyTurnToPlay) {
-                playBtn.classList.remove('disabled');
-            } else {
-                playBtn.classList.add('disabled');
-            }
-
-            // رسم أوراق الطاولة
-            let trickHtml = '';
-            gameState.currentTrick.forEach(t => {
-                let posClass = 'tc-bottom';
-                if(t.playerId === gameState.players[partnerIdx].id) posClass = 'tc-top';
-                else if(t.playerId === gameState.players[leftIdx].id) posClass = 'tc-left';
-                else if(t.playerId === gameState.players[rightIdx].id) posClass = 'tc-right';
-
-                trickHtml += `
-                    <div class="playing-card ${t.card.color} trick-card ${posClass}">
-                        <div class="card-top">${t.card.rank}${t.card.suit}</div>
-                        <div class="card-center">${t.card.suit}</div>
-                        <div class="card-bottom">${t.card.rank}${t.card.suit}</div>
-                    </div>`;
-            });
-            document.getElementById('table-trick').innerHTML = trickHtml;
-        }
-
-        function _updatePos(elemId, pIdx, activeId) {
-            let el = document.getElementById(elemId);
-            let p = gameState.players[pIdx];
-            if(!p) return;
-            el.className = `player-pos ${elemId.split('-')[1]} ${(p.id === activeId) ? 'active' : ''}`;
-            let team = pIdx % 2 === 0 ? 'team1' : 'team2';
-            el.innerText = `${p.name}\n(${gameState.trickScores[team]})`;
-        }
-
-        // ==========================================
-        // 4. التفاعلات والنوافذ
-        // ==========================================
-        function selectCard(id, isMyTurn, isValid) {
-            if(!isMyTurn) return showToast("ليس دورك!");
-            if(!isValid) return showToast("يجب أن تلعب من نفس اللون المطلوب!");
-            selectedCardId = (selectedCardId === id) ? null : id;
-            renderGame();
-        }
-
-        function confirmPlayCard() {
-            if(!selectedCardId) return;
-            sendAction({ type: 'play_card', playerId: myId, cardId: selectedCardId });
-            selectedCardId = null;
-        }
-
-        function showFullHandModal() {
-            let me = gameState.players.find(p => p.id === myId);
-            let html = '';
-            me.hand.forEach(c => {
-                html += `
-                    <div class="playing-card ${c.color}">
-                        <div class="card-top">${c.rank}${c.suit}</div>
-                        <div class="card-center" style="font-size:1.2rem;">${c.suit}</div>
-                        <div class="card-bottom">${c.rank}${c.suit}</div>
-                    </div>`;
-            });
-            document.getElementById('full-hand-grid-content').innerHTML = html;
-            showModal('modal-full-hand');
-        }
-
-        function handleModals() {
-            let isMyTurn = (gameState.players[gameState.turnIdx]?.id === myId);
-            
-            closeModal('modal-bid'); closeModal('modal-suit');
-            
-            if(gameState.status === 'bidding' && isMyTurn) {
-                document.getElementById('current-highest-bid').innerText = gameState.highestBid > 6 ? gameState.highestBid : 'لا يوجد';
-                let optsHtml = '';
-                for(let i = Math.max(7, gameState.highestBid + 1); i <= 13; i++) {
-                    optsHtml += `<button class="bid-btn" onclick="submitBid(${i})">${i}</button>`;
-                }
-                document.getElementById('bid-options').innerHTML = optsHtml;
-                showModal('modal-bid');
-            }
-            else if(gameState.status === 'suit_selection' && isMyTurn) {
-                showModal('modal-suit');
-            }
-        }
-
-        function submitBid(val) { sendAction({ type: 'make_bid', playerId: myId, bid: val }); }
-        function submitSuit(suit) { sendAction({ type: 'select_suit', playerId: myId, suit: suit }); }
-
     </script>
 </body>
 </html>
