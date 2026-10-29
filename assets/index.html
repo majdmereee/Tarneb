@@ -9,10 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Tajawal:wght@700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #f7f6f2;
+            --bg-body: #f8f6f2;
             --bg-card: #ffffff;
-            --text-main: #111111;
-            --text-muted: #333333;
+            --text-main: #141414;
+            --text-muted: #2d2d2d;
             --primary: #0f3d2e;
             --accent: #b31212;
             --gold: #8a6519;
@@ -37,50 +37,55 @@
             flex-direction: column;
             align-items: center;
             font-size: var(--font-size-base);
-            line-height: 1.8;
+            line-height: 1.85;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* شريط علوي نحيف ومرتب */
+        /* شريط علوي أنيق ونحيف */
         header {
             width: 100%;
             max-width: 680px;
             background-color: var(--primary);
             color: #ffffff;
-            padding: 8px 12px;
+            padding: 10px 14px;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--gold);
+            border-bottom: 3px solid var(--gold);
         }
 
         .header-btn {
             background-color: #ffffff;
             color: var(--primary);
             border: none;
-            padding: 6px 14px;
-            font-size: 1rem;
-            font-weight: 800;
+            padding: 6px 16px;
+            font-size: 1.05rem;
+            font-weight: 900;
             font-family: 'Tajawal', sans-serif;
             border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .header-btn:active {
-            background-color: #ebdcb9;
+            background-color: #e5d8be;
         }
 
-        .header-info {
+        .current-lesson-label {
             font-size: 1.1rem;
-            font-weight: 800;
+            font-weight: 900;
             color: #fceecb;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 50%;
         }
 
         .font-actions {
@@ -90,13 +95,13 @@
         }
 
         .font-btn {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.18);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.45);
             border-radius: 6px;
-            width: 36px;
-            height: 34px;
-            font-size: 1.1rem;
+            width: 38px;
+            height: 36px;
+            font-size: 1.15rem;
             font-weight: 900;
             font-family: 'Tajawal', sans-serif;
             cursor: pointer;
@@ -110,20 +115,20 @@
             color: var(--primary);
         }
 
-        /* حاوية المحتوى */
+        /* حاوية الصفحة */
         main.book-wrapper {
             width: 100%;
             max-width: 680px;
-            padding: 12px 12px 90px 12px;
+            padding: 16px 14px 40px 14px;
             flex-grow: 1;
         }
 
         .page-sheet {
             background-color: var(--bg-card);
             border: 2px solid var(--border-ui);
-            border-radius: 12px;
-            padding: 18px 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            border-radius: 14px;
+            padding: 22px 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
             display: none;
         }
 
@@ -133,38 +138,37 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(3px); }
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* عناوين الدروس المباشرة الصريحة */
         h1.lesson-title {
             color: var(--primary);
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 900;
             text-align: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #e8e2d5;
-            line-height: 1.3;
+            line-height: 1.35;
         }
 
         p.text-block {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             color: var(--text-muted);
             text-align: justify;
         }
 
-        /* الصندوق القرآني المخصص للخط العثماني الواضح */
+        /* الصندوق القرآني للخط العثماني الواضح */
         .quran-verse {
             background-color: #fbf9f4;
             border: 2px solid #bed3c4;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin: 12px 0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin: 14px 0;
             font-family: 'Amiri Quran', serif;
-            font-size: calc(var(--font-size-base) * 1.15);
-            line-height: 2.2;
+            font-size: calc(var(--font-size-base) * 1.18);
+            line-height: 2.3;
             color: #0b3d2b;
             text-align: center;
             direction: rtl;
@@ -175,76 +179,25 @@
             font-weight: bold;
         }
 
-        /* صناديق القواعد المختصرة */
+        /* مربعات القاعدة والضوابط */
         .rule-box {
             background-color: #f7f9f7;
             border-right: 5px solid var(--primary);
-            padding: 10px 12px;
-            margin: 10px 0;
-            border-radius: 4px 8px 8px 4px;
-            font-size: 0.95em;
+            padding: 12px 14px;
+            margin: 12px 0;
+            border-radius: 4px 10px 10px 4px;
+            font-size: 0.98em;
         }
 
         .rule-letters {
             background-color: #eee7d5;
             color: var(--accent);
-            padding: 3px 10px;
-            border-radius: 6px;
+            padding: 4px 12px;
+            border-radius: 8px;
             display: inline-block;
             font-size: 1.05em;
             margin: 4px 0;
             font-weight: 900;
-        }
-
-        /* شريط سفلي مضغوط وعالي الاستجابة */
-        footer.bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #ffffff;
-            border-top: 2px solid var(--border-ui);
-            padding: 8px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
-            z-index: 100;
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .nav-button {
-            background-color: var(--primary);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 110px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .nav-button:disabled {
-            background-color: #c4d1c9;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .nav-button:active:not(:disabled) {
-            background-color: #08261c;
-        }
-
-        .counter-badge {
-            font-size: 1.15rem;
-            font-weight: 900;
-            color: #333333;
         }
 
         /* نافذة الفهرس */
@@ -259,60 +212,66 @@
             z-index: 300;
             justify-content: center;
             align-items: center;
-            padding: 12px;
+            padding: 14px;
         }
 
         .modal-box {
             background: #ffffff;
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             max-height: 85vh;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 2px solid var(--gold);
+            border: 3px solid var(--gold);
         }
 
         .modal-top {
             background: var(--primary);
             color: #ffffff;
-            padding: 12px 16px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             font-weight: 900;
         }
 
         .btn-close {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.15);
             color: #ffffff;
-            border: none;
-            font-size: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            font-size: 1.4rem;
             cursor: pointer;
             font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .index-items-container {
             overflow-y: auto;
-            padding: 10px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .index-link-btn {
             background: #fbfaf7;
             border: 1.5px solid #ded5c5;
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 14px 18px;
+            border-radius: 10px;
             font-size: 1.25rem;
-            font-weight: 800;
+            font-weight: 900;
             font-family: 'Tajawal', sans-serif;
             text-align: right;
             cursor: pointer;
-            color: #1a1a1a;
+            color: #141414;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -325,39 +284,23 @@
 </head>
 <body>
 
-    <!-- شريط علوي موفر للمساحة وبسيط -->
+    <!-- شريط علوي به الفهرس والخط فقط دون أزرار تقليب -->
     <header>
         <button class="header-btn" onclick="openIndex()">📖 الفهرس</button>
-        <span class="header-info" id="topPageIndicator">١ من ١٦</span>
+        <span class="current-lesson-label" id="currentLessonHeader">الإظهار الحلقي</span>
         <div class="font-actions">
             <button class="font-btn" onclick="modifyFontSize(2)" title="تكبير الخط">A+</button>
             <button class="font-btn" onclick="modifyFontSize(-2)" title="تصغير الخط">A-</button>
         </div>
     </header>
 
-    <!-- مساحة الدروس المباشرة -->
-    <main class="book-wrapper" id="bookWrapper">
+    <!-- منطقة المحتوى التجويدي المباشر -->
+    <main class="book-wrapper">
 
-        <!-- 1 -->
+        <!-- 1: الإظهار الحلقي -->
         <article class="page-sheet active" id="p1">
-            <h1 class="lesson-title">النون الساكنة والتنوين</h1>
-            <p class="text-block">النون الساكنة (نْ) والتنوين ( ً ٍ ٌ ) عند التلاوة لهما ٤ أحكام رئيسية:</p>
-            <div class="rule-box">
-                ١- الإظهار الحلقي.<br>
-                ٢- الإدغام (بغنة - بغير غنة).<br>
-                ٣- الإقلاب.<br>
-                ٤- الإخفاء.
-            </div>
-            <div class="quran-verse">
-                مثال تنوين: ﴿سَمِي<b>عٌۢ بَـ</b>صِيرٌ﴾<br>
-                مثال نون: ﴿مِ<b>نْ خَـ</b>وْفٍ﴾
-            </div>
-        </article>
-
-        <!-- 2 -->
-        <article class="page-sheet" id="p2">
             <h1 class="lesson-title">الإظهار الحلقي</h1>
-            <p class="text-block">نطق النون أو التنوين بوضوح تام وبدون أي غنة زائدة إذا جاء بعدها أحد الحروف الستة:</p>
+            <p class="text-block">نطق النون الساكنة أو التنوين واضحة جلية من مخرجها دون غنة زائدة إذا جاء بعدها أحد الحروف الستة الآتية:</p>
             <div class="rule-box" style="text-align: center;">
                 <span class="rule-letters">ء - هـ - ع - ح - غ - خ</span>
             </div>
@@ -367,14 +310,15 @@
                 ﴿عَلِي<b>مٌ حَـ</b>كِيمٌ﴾<br>
                 ﴿جَنَّـ<b>اتٍ أَلْـ</b>فَافاً﴾
             </div>
+            <p class="text-block">تُنطق النون والتنوين بلسان ثابت دون تردد أو مد في الصوت.</p>
         </article>
 
-        <!-- 3 -->
-        <article class="page-sheet" id="p3">
+        <!-- 2: الإدغام بغنة -->
+        <article class="page-sheet" id="p2">
             <h1 class="lesson-title">الإدغام بغنة</h1>
-            <p class="text-block">دمج النون الساكنة أو التنوين بالحرف الذي بعدها مع صوت غنة يخرج من الأنف بمقدار حركتين:</p>
+            <p class="text-block">إدخال النون الساكنة أو التنوين في الحرف الذي بعدها لِيصيرا حرفاً واحداً مشدداً، مع خروج غنة من الخيشوم بمقدار حركتين:</p>
             <div class="rule-box" style="text-align: center;">
-                حروفه مجموعة في كلمة: <span class="rule-letters">يَنْمُو</span>
+                حروفه مجموعة في كلمة: <span class="rule-letters">يَنْمُو (ي - ن - م - و)</span>
             </div>
             <div class="quran-verse">
                 ﴿مَ<b>ن يَّـ</b>قُولُ﴾ ➔ تُقرأ: (مَيَّقُول)<br>
@@ -382,12 +326,13 @@
                 ﴿مِ<b>ن نِّـ</b>عْمَةٍ﴾<br>
                 ﴿وُجُـ<b>وهٌ يَّـ</b>وْمَئِذٍ﴾
             </div>
+            <p class="text-block">شرطه أن يكون في كلمتين؛ فإن وقع في كلمة واحدة وجب الإظهار المطلق مثل: (دُنْيَا، بُنْيَان، قِنْوَان، صِنْوَان).</p>
         </article>
 
-        <!-- 4 -->
-        <article class="page-sheet" id="p4">
+        <!-- 3: الإدغام بغير غنة -->
+        <article class="page-sheet" id="p3">
             <h1 class="lesson-title">الإدغام بغير غنة</h1>
-            <p class="text-block">إدخال النون الساكنة أو التنوين بالكامل في الحرف التالي دون إصدار أي صوت أنفي:</p>
+            <p class="text-block">إدخال النون الساكنة أو التنوين في الحرف التالي بالكامل دون بقاء أي أثر لصوت الغنة:</p>
             <div class="rule-box" style="text-align: center;">
                 حرفاه هما: <span class="rule-letters">اللام (ل) - الراء (ر)</span>
             </div>
@@ -398,10 +343,10 @@
             </div>
         </article>
 
-        <!-- 5 -->
-        <article class="page-sheet" id="p5">
+        <!-- 4: الإقلاب -->
+        <article class="page-sheet" id="p4">
             <h1 class="lesson-title">الإقلاب</h1>
-            <p class="text-block">قلب النون الساكنة أو التنوين إلى (ميم خفيفة) مع غنة إذا جاء بعدها حرف الباء فقط:</p>
+            <p class="text-block">قلب النون الساكنة أو التنوين إلى ميم مخفاة مع غنة مقدارها حركتان، إذا جاء بعدها حرف الباء فقط:</p>
             <div class="rule-box" style="text-align: center;">
                 حرفه الوحيد: <span class="rule-letters">الباء (ب)</span>
             </div>
@@ -410,26 +355,26 @@
                 ﴿أَنۢ بُـورِكَ﴾ ➔ تُقرأ: (أَمْبُورِك)<br>
                 ﴿عَلِي<b>مٌۢ بِـ</b>ذَاتِ الصُّدُورِ﴾
             </div>
-            <p class="text-block">تجد في المصحف حرف ميم صغير ( <b>مـ</b> ) دلالة على الإقلاب.</p>
+            <p class="text-block">علامته بالمصحف: وضع ميم صغيرة قائمة ( <b>مـ</b> ) فوق النون أو التنوين، مع تلامس الشفتين برفق دون ضغط شديد.</p>
         </article>
 
-        <!-- 6 -->
-        <article class="page-sheet" id="p6">
-            <h1 class="lesson-title">الإخفاء</h1>
-            <p class="text-block">ستر مخرج النون ونطقها بين الإظهار والإدغام مع بقاء الغنة عند بقية الحروف الـ ١٥:</p>
+        <!-- 5: الإخفاء الحقيقي -->
+        <article class="page-sheet" id="p5">
+            <h1 class="lesson-title">الإخفاء الحقيقي</h1>
+            <p class="text-block">ستر مخرج النون ونطقها بحالة وسطى بين الإظهار والإدغام مع بقاء الغنة ظاهرة بمقدار حركتين:</p>
             <div class="rule-box" style="text-align: center;">
+                حروفه (١٥) حرفاً:<br>
                 <span class="rule-letters">ص - ذ - ث - ك - ج - ش - ق - س - د - ط - ز - ف - ت - ض - ظ</span>
             </div>
             <div class="quran-verse">
-                ﴿مِ<b>ن قَـ</b>بْلُ﴾<br>
-                ﴿مِ<b>ن دُ</b>ونِ﴾<br>
-                ﴿أَ<b>نتُمْ</b>﴾<br>
-                ﴿كِتَـ<b>ابٌ كَـ</b>رِيمٌ﴾
+                ﴿مِ<b>ن قَـ</b>بْلُ﴾ (غنة مفخمة)<br>
+                ﴿مِ<b>ن دُ</b>ونِ﴾ (غنة مرققة)<br>
+                ﴿أَ<b>نتُمْ</b>﴾ - ﴿كِتَـ<b>ابٌ كَـ</b>رِيمٌ﴾
             </div>
         </article>
 
-        <!-- 7 -->
-        <article class="page-sheet" id="p7">
+        <!-- 6: الميم والنون المشددتان -->
+        <article class="page-sheet" id="p6">
             <h1 class="lesson-title">الميم والنون المشددتان</h1>
             <p class="text-block">أي نون أو ميم فوقها شدة، يجب مَد الصوت فيها بغنة كاملة بمقدار حركتين وصلاً ووقفاً:</p>
             <div class="rule-box" style="text-align: center;">
@@ -443,41 +388,42 @@
             </div>
         </article>
 
-        <!-- 8 -->
-        <article class="page-sheet" id="p8">
-            <h1 class="lesson-title">الميم الساكنة</h1>
-            <p class="text-block">الميم الخالية من الحركة (مْ) لها ثلاثة أحكام فقط بحسب الحرف الذي بعدها:</p>
+        <!-- 7: أحكام الميم الساكنة -->
+        <article class="page-sheet" id="p7">
+            <h1 class="lesson-title">أحكام الميم الساكنة</h1>
+            <p class="text-block">الميم الساكنة (مْ) لها ثلاثة أحكام فقط بحسب الحرف الذي يليها:</p>
             <div class="rule-box">
-                ١- <b>إخفاء شفوي:</b> مع حرف (الباء).<br>
-                ٢- <b>إدغام مثلين:</b> مع حرف (الميم).<br>
-                ٣- <b>إظهار شفوي:</b> مع باقي الحروف كلها.
+                ١- <b>إخفاء شفوي:</b> إذا جاء بعدها حرف (الباء) فقط.<br>
+                ٢- <b>إدغام مثلين صغير:</b> إذا جاء بعدها حرف (الميم).<br>
+                ٣- <b>إظهار شفوي:</b> مع بقية كل حروف الهجاء (٢٦ حرفاً).
             </div>
             <div class="quran-verse">
                 ﴿تَرْمِيهِ<b>م بِـ</b>حِجَارَةٍ﴾ (إخفاء)<br>
                 ﴿لَهُ<b>م مَّـ</b>ا يَشَاءُونَ﴾ (إدغام)<br>
                 ﴿أَنْعَمْـ<b>تَ</b> عَلَيْهِمْ﴾ (إظهار)
             </div>
+            <p class="text-block">تنبيه: يجب إظهار الميم بقوة إذا جاء بعدها (الواو أو الفاء) لئلا تختفي مع مخرج الشفتين.</p>
         </article>
 
-        <!-- 9 -->
-        <article class="page-sheet" id="p9">
+        <!-- 8: القلقلة -->
+        <article class="page-sheet" id="p8">
             <h1 class="lesson-title">القلقلة</h1>
-            <p class="text-block">اضطراب واهتزاز صوت الحرف عند سكونه ليظهر قوياً جلياً:</p>
+            <p class="text-block">اضطراب في مخرج الحرف عند سكونه حتى يُسمع له نبرة قوية واضحة:</p>
             <div class="rule-box" style="text-align: center;">
-                حروفها: <span class="rule-letters">قُطْبُ جَدٍّ (ق - ط - ب - ج - د)</span>
+                حروفها خمسة: <span class="rule-letters">قُطْبُ جَدٍّ (ق - ط - ب - ج - د)</span>
             </div>
             <div class="quran-verse">
                 عند الوقف (كبرى قوية):<br>
-                ﴿قُلْ هُوَ اللَّهُ أَحَ<b>دْ</b>﴾ - ﴿الفَلَ<b>قْ</b>﴾<br><br>
-                في وسط الكلمة (صغرى):<br>
+                ﴿قُلْ هُوَ اللَّهُ أَحَ<b>دْ</b>﴾ - ﴿الفَلَ<b>قْ</b>﴾ - ﴿كَسَ<b>بْ</b>﴾<br><br>
+                في وسط الكلمة (صغرى خفيفة):<br>
                 ﴿يَ<b>قْـ</b>طَعُونَ﴾ - ﴿يَ<b>طْـ</b>مَعُ﴾ - ﴿تَ<b>جْـ</b>رِي﴾
             </div>
         </article>
 
-        <!-- 10 -->
-        <article class="page-sheet" id="p10">
+        <!-- 9: المد الطبيعي -->
+        <article class="page-sheet" id="p9">
             <h1 class="lesson-title">المد الطبيعي</h1>
-            <p class="text-block">هو مد حروف المد الثلاثة (الألف، الواو، الياء) بدون زيادة ولا نقصان لعدم وجود همز أو سكون:</p>
+            <p class="text-block">هو إطالة الصوت بحرف من حروف المد الثلاثة (الألف، الواو، الياء) دون زيادة أو نقصان لعدم وجود همز أو سكون:</p>
             <div class="rule-box" style="text-align: center;">
                 مقداره: <b>حركتان فقط</b> (بقدر نطق حرفين متتاليين)
             </div>
@@ -488,10 +434,10 @@
             </div>
         </article>
 
-        <!-- 11 -->
-        <article class="page-sheet" id="p11">
+        <!-- 10: المد الواجب المتصل -->
+        <article class="page-sheet" id="p10">
             <h1 class="lesson-title">المد الواجب المتصل</h1>
-            <p class="text-block">أن يقع حرف المد وتليه الهمزة مباشرة في كلمة واحدة:</p>
+            <p class="text-block">أن يقع حرف المد وتليه الهمزة مباشرة في ذات الكلمة الواحدة:</p>
             <div class="rule-box" style="text-align: center;">
                 حكمه ومقداره: <b>واجب المد (٤ أو ٥ حركات)</b>
             </div>
@@ -500,15 +446,15 @@
                 ﴿وَالسَّمَ<b>آ</b>ءِ ذَاتِ الْبُرُوجِ﴾<br>
                 ﴿سُو<b>ٓ</b>ءَ الْعَذَابِ﴾
             </div>
-            <p class="text-block">توضع فوق الحرف علامة المد ( ~ ) في المصحف.</p>
+            <p class="text-block">توضع فوق الحرف علامة المد ( ~ ) في المصحف دلالة على زيادته عن الطبيعي.</p>
         </article>
 
-        <!-- 12 -->
-        <article class="page-sheet" id="p12">
+        <!-- 11: المد الجائز المنفصل -->
+        <article class="page-sheet" id="p11">
             <h1 class="lesson-title">المد الجائز المنفصل</h1>
-            <p class="text-block">أن يكون حرف المد في نهاية الكلمة الأولى، وتأتي الهمزة في بداية الكلمة التالية مباشرة:</p>
+            <p class="text-block">أن يكون حرف المد في آخر الكلمة، وتأتي الهمزة في بداية الكلمة التي تليها مباشرة:</p>
             <div class="rule-box" style="text-align: center;">
-                مقداره: <b>يُمَد ٤ أو ٥ حركات</b>
+                مقداره في رواية حفص المشهورة: <b>٤ أو ٥ حركات</b>
             </div>
             <div class="quran-verse">
                 ﴿إِنَّ<b>ـآ أَنْـ</b>زَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ﴾<br>
@@ -517,12 +463,12 @@
             </div>
         </article>
 
-        <!-- 13 -->
-        <article class="page-sheet" id="p13">
+        <!-- 12: المد العارض للسكون -->
+        <article class="page-sheet" id="p12">
             <h1 class="lesson-title">المد العارض للسكون</h1>
-            <p class="text-block">أن يأتي حرف المد قبل الحرف الأخير في الكلمة التي نقف عليها عند رأس الآية:</p>
+            <p class="text-block">أن يأتي حرف المد قبل الحرف الأخير في الكلمة التي نقف عليها عند نهاية الآية أو الوقف:</p>
             <div class="rule-box" style="text-align: center;">
-                مقداره: <b>يجوز حركتان أو ٤ أو ٦ (الأيسر التوسط ٤)</b>
+                مقداره: <b>يجوز حركتان أو ٤ أو ٦ (الأيسر التوسط ٤ حركات)</b>
             </div>
             <div class="quran-verse">
                 ﴿الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِ<b>ـينْ</b>﴾<br>
@@ -531,12 +477,12 @@
             </div>
         </article>
 
-        <!-- 14 -->
-        <article class="page-sheet" id="p14">
+        <!-- 13: المد اللازم -->
+        <article class="page-sheet" id="p13">
             <h1 class="lesson-title">المد اللازم</h1>
-            <p class="text-block">أن يأتي بعد حرف المد سكون أصلي دائم أو حرف مشدد، وهو أطول المدود:</p>
+            <p class="text-block">أن يأتي بعد حرف المد سكون أصلي دائم أو حرف مشدد، وهو أطول المدود في القرآن:</p>
             <div class="rule-box" style="text-align: center;">
-                مقداره: <b>٦ حركات كاملة دون زيادة أو نقصان</b>
+                مقداره: <b>٦ حركات مشبعة لزوماً دون زيادة أو نقصان</b>
             </div>
             <div class="quran-verse">
                 ﴿وَلَا الضَّ<b>ـآلِّـ</b>ينَ﴾<br>
@@ -545,54 +491,58 @@
             </div>
         </article>
 
-        <!-- 15 -->
-        <article class="page-sheet" id="p15">
+        <!-- 14: تفخيم وترقيق الراء -->
+        <article class="page-sheet" id="p14">
             <h1 class="lesson-title">تفخيم وترقيق الراء</h1>
-            <p class="text-block">حرف الراء له حالتان حسب حركته المباشرة:</p>
+            <p class="text-block">حرف الراء له حالتان واضحتان بحسب حركته المباشرة:</p>
             <div class="rule-box">
-                <b>١- تفخيم (صوت سميك):</b> إذا كانت مفتوحة أو مضمومة.<br>
-                <b>٢- ترقيق (صوت نحيف):</b> إذا كانت مكسورة.
+                <b>١- تفخيم (صوت سميك):</b> إذا كانت مفتوحة أو مضمومة أو ساكنة قبلها فتح أو ضم.<br>
+                <b>٢- ترقيق (صوت نحيف):</b> إذا كانت مكسورة أو ساكنة قبلها كسر أصلي.
             </div>
             <div class="quran-verse">
-                تفخيم: ﴿<b>رَ</b>حْمَةٌ﴾ - ﴿<b>رُ</b>زِقْنَا﴾<br>
+                تفخيم: ﴿<b>رَ</b>حْمَةٌ﴾ - ﴿<b>رُ</b>زِقْنَا﴾ - ﴿قُـ<b>ـرْ</b>آن﴾<br>
                 ترقيق: ﴿<b>رِ</b>جَالٌ﴾ - ﴿فِـ<b>ـرْ</b>عَوْنَ﴾
             </div>
         </article>
 
-        <!-- 16 -->
+        <!-- 15: لام لفظ الجلالة -->
+        <article class="page-sheet" id="p15">
+            <h1 class="lesson-title">لام لفظ الجلالة (الله)</h1>
+            <p class="text-block">اللام في اللغة رقيقة دائماً، لكنها في اسم الجلالة تُفخم أو تُرقق حسب الحركة السابقة لها:</p>
+            <div class="rule-box">
+                <b>١- تفخيم (تغليظ):</b> إذا سُبقت بفتح أو ضم.<br>
+                <b>٢- ترقيق:</b> إذا سُبقت بكسر.
+            </div>
+            <div class="quran-verse">
+                تفخيم: ﴿قَالَ <b>اللَّهُ</b>﴾ - ﴿شَهِدَ <b>اللَّهُ</b>﴾ - ﴿عَبْدُ <b>اللَّهِ</b>﴾<br>
+                ترقيق: ﴿بِسْمِ <b>اللَّهِ</b>﴾ - ﴿قُلِ <b>اللَّهُمَّ</b>﴾ - ﴿دِينِ <b>اللَّهِ</b>﴾
+            </div>
+        </article>
+
+        <!-- 16: علامات الوقف في المصحف -->
         <article class="page-sheet" id="p16">
             <h1 class="lesson-title">علامات الوقف في المصحف</h1>
-            <p class="text-block">إشارات صغيرة فوق الكلمات لضبط التوقف والوصل:</p>
+            <p class="text-block">رموز صغيرة توضع فوق الكلمات لتوجيه القارئ أين يقف وأين يصل بصورة صحيحة:</p>
             <div class="rule-box">
-                <b>( مـ ):</b> وقف لازم (يجب الوقوف).<br>
-                <b>( لا ):</b> لا تقف (واصل القراءة).<br>
-                <b>( ج ):</b> وقف جائز (قف أو واصل كما تحب).<br>
-                <b>( صلى ):</b> الوصل أفضل وأولى.<br>
-                <b>( قلى ):</b> الوقف أفضل وأولى.
+                <b>( مـ ):</b> وقف لازم (يجب الوقوف لسلامة المعنى).<br>
+                <b>( لا ):</b> لا تقف (واصل القراءة لأن المعنى متصل).<br>
+                <b>( ج ):</b> وقف جائز (يجوز الوقوف ويجوز الوصل).<br>
+                <b>( صلى ):</b> الوصل أولى وأفضل مع جواز الوقف.<br>
+                <b>( قلى ):</b> الوقف أولى وأفضل مع جواز الوصل.<br>
+                <b>( ∴ ∴ ):</b> تعانق الوقف؛ إذا وقفت على موضع لا تقف على الآخر.
             </div>
-            <div class="quran-verse" style="font-size: 1.1em; color: var(--primary);">
+            <div class="quran-verse">
                 ﴿فَتَوَلَّ عَنْهُمْ ۘ <b>يَوْمَ يَدْعُ الدَّاعِ</b>﴾
             </div>
         </article>
 
     </main>
 
-    <!-- شريط سفلي متين ومناسب جداً للضغط السريع -->
-    <footer class="bottom-bar">
-        <button class="nav-button" id="prevBtn" onclick="turnPage(-1)">
-            السابق ⬅
-        </button>
-        <span class="counter-badge" id="bottomPageIndicator">١ / ١٦</span>
-        <button class="nav-button" id="nextBtn" onclick="turnPage(1)">
-            ➡ التالي
-        </button>
-    </footer>
-
-    <!-- نافذة الفهرس السريع بخط كبير -->
+    <!-- نافذة الفهرس بخط كبير وبطاقات واسعة -->
     <div class="modal-overlay" id="indexModal" onclick="closeIndexBackdrop(event)">
         <div class="modal-box">
             <div class="modal-top">
-                <span>فهرس الدروس السريع</span>
+                <span>فهرس أحكام التجويد</span>
                 <button class="btn-close" onclick="closeIndex()">✕</button>
             </div>
             <div class="index-items-container" id="indexContainer"></div>
@@ -605,14 +555,13 @@
         let fontSize = parseInt(localStorage.getItem('preferred_font_size')) || 24;
 
         const lessonList = [
-            "النون الساكنة والتنوين",
             "الإظهار الحلقي",
             "الإدغام بغنة",
             "الإدغام بغير غنة",
             "الإقلاب",
-            "الإخفاء",
+            "الإخفاء الحقيقي",
             "الميم والنون المشددتان",
-            "الميم الساكنة",
+            "أحكام الميم الساكنة",
             "القلقلة",
             "المد الطبيعي",
             "المد الواجب المتصل",
@@ -620,11 +569,12 @@
             "المد العارض للسكون",
             "المد اللازم",
             "تفخيم وترقيق الراء",
+            "لام لفظ الجلالة (الله)",
             "علامات الوقف في المصحف"
         ];
 
         function setFontSize(val) {
-            fontSize = Math.min(Math.max(val, 20), 38);
+            fontSize = Math.min(Math.max(val, 20), 40);
             document.documentElement.style.setProperty('--font-size-base', fontSize + 'px');
             localStorage.setItem('preferred_font_size', fontSize);
         }
@@ -638,41 +588,27 @@
             return n.toString().split('').map(d => arr[parseInt(d)]).join('');
         }
 
-        function refreshPage() {
+        function displayLesson(pageNum) {
+            if (pageNum < 1 || pageNum > total) return;
+            activePage = pageNum;
+
             for (let i = 1; i <= total; i++) {
-                const p = document.getElementById('p' + i);
-                if (p) p.classList.remove('active');
+                const sheet = document.getElementById('p' + i);
+                if (sheet) sheet.classList.remove('active');
             }
 
-            const cur = document.getElementById('p' + activePage);
-            if (cur) cur.classList.add('active');
+            const currentSheet = document.getElementById('p' + activePage);
+            if (currentSheet) currentSheet.classList.add('active');
 
-            const arCurrent = toArabicNumbers(activePage);
-            const arTotal = toArabicNumbers(total);
-
-            document.getElementById('topPageIndicator').innerText = `${arCurrent} من ${arTotal}`;
-            document.getElementById('bottomPageIndicator').innerText = `${arCurrent} / ${arTotal}`;
-
-            document.getElementById('prevBtn').disabled = (activePage === 1);
-            document.getElementById('nextBtn').disabled = (activePage === total);
+            // تحديث اسم الدرس بالشريط العلوي
+            document.getElementById('currentLessonHeader').innerText = lessonList[activePage - 1];
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function turnPage(delta) {
-            const target = activePage + delta;
-            if (target >= 1 && target <= total) {
-                activePage = target;
-                refreshPage();
-            }
-        }
-
         function jumpTo(pageNum) {
-            if (pageNum >= 1 && pageNum <= total) {
-                activePage = pageNum;
-                refreshPage();
-                closeIndex();
-            }
+            displayLesson(pageNum);
+            closeIndex();
         }
 
         function renderIndex() {
@@ -700,24 +636,10 @@
             if (e.target.id === 'indexModal') closeIndex();
         }
 
-        // سحب الشاشة للتنقل بالإصبع
-        let startX = 0;
-        let endX = 0;
-
-        document.addEventListener('touchstart', e => {
-            startX = e.changedTouches[0].screenX;
-        }, { passive: true });
-
-        document.addEventListener('touchend', e => {
-            endX = e.changedTouches[0].screenX;
-            if (endX < startX - 60) turnPage(1);   // سحب لليسار = التالي
-            if (endX > startX + 60) turnPage(-1);  // سحب لليمين = السابق
-        }, { passive: true });
-
         window.onload = function() {
             setFontSize(fontSize);
             renderIndex();
-            refreshPage();
+            displayLesson(1);
         };
     </script>
 </body>
